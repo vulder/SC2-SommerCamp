@@ -17,6 +17,7 @@ allprojects {
 }
 
 dependencies {
+    compile 'javax.websocket:javax.websocket-client-api:1.0'
     testCompile 'junit:junit:4.12'
 }
 
