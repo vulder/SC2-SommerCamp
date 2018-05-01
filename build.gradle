@@ -1,0 +1,22 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'idea'
+}
+
+group 'de.uni-passau.fim.sommercamp'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+allprojects {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+}
+
+dependencies {
+    testCompile 'junit:junit:4.12'
+}
+
