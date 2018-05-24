@@ -56,3 +56,9 @@ out/
 .idea/
 SC2.iml
 
+.gradle/
+.vertx/
+
+
+### Lib files
+!libs/*.jar
