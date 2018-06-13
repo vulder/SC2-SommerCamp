@@ -21,7 +21,7 @@ Copy the maps into the game folder:
 Starting the game for AI client to connect to:
 ```bash
   > cd /home/$USER/SC2/SC2/StarCraft\ II/Support
-  > WINEPREFIX=/home/vulder/SC2/bnet wine ../Versions/Base64469/SC2.exe -listen 127.0.0.1 -port 8167 -displayMode 1 -windowwidth 1024 -windowheight 768 -windowx 100 -windowy 200
+  > WINEPREFIX=/home/$USER/SC2/bnet wine ../Versions/Base64469/SC2.exe -listen 127.0.0.1 -port 8167 -displayMode 1 -windowwidth 1024 -windowheight 768 -windowx 100 -windowy 200
 ```
 
 [sc2installer]: https://www.battle.net/download/getInstallerForGame?os=win&locale=enUS&version=LIVE&gameProgram=STARCRAFT_2
