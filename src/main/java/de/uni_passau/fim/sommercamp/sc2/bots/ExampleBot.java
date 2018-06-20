@@ -2,11 +2,9 @@ package de.uni_passau.fim.sommercamp.sc2.bots;
 
 import com.github.ocraft.s2client.api.S2Client;
 import com.github.ocraft.s2client.protocol.spatial.Point2d;
-import com.github.ocraft.s2client.protocol.unit.Unit;
 import de.uni_passau.fim.sommercamp.sc2.BaseBot;
 import de.uni_passau.fim.sommercamp.sc2.BotUnit;
 
-import java.util.Arrays;
 import java.util.Comparator;
 
 public class ExampleBot extends BaseBot {
@@ -32,8 +30,7 @@ public class ExampleBot extends BaseBot {
         if (!searching & !attacking) {
             searching = true;
 
-            Unit r = getUnits()[0];
-            runner = new BotUnit(this, r.getTag());
+            runner = getUnits().get(0);
             Point2d base = runner.getPosition();
             if (base.getX() > getInfo().mapData.getMapSize().getX() / 2) {
                 if (base.getY() > getInfo().mapData.getMapSize().getY() / 2) {
@@ -54,7 +51,7 @@ public class ExampleBot extends BaseBot {
             patrol();
         }
 
-        if (!attacking && getVisibleEnemies().length != 0) {
+        if (!attacking && getVisibleEnemies().size() != 0) {
             attacking = true;
             searching = false;
         }
@@ -76,15 +73,15 @@ public class ExampleBot extends BaseBot {
                 attacking = false;
                 searching = true;
             }
-        } else if (getVisibleEnemies().length != 0) {
-            target = new BotUnit(this, Arrays.stream(getVisibleEnemies()).min(Comparator.comparing(e -> e.getHealth().orElse(1f))).get());
+        } else if (getVisibleEnemies().size() != 0) {
+            target = getVisibleEnemies().stream().min(Comparator.comparing(BotUnit::getHealth)).get();
             attackTarget(target, runner);
             needCooling = true;
         }
     }
 
     private void patrol() {
-        if (!runner.getOrderList().isEmpty()) {
+        if (!runner.getOrders().isEmpty()) {
             return;
         }
 

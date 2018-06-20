@@ -1,41 +1,42 @@
 package de.uni_passau.fim.sommercamp.sc2;
 
 import com.github.ocraft.s2client.api.S2Client;
-import com.github.ocraft.s2client.protocol.observation.Observation;
 import com.github.ocraft.s2client.protocol.request.Request;
 import com.github.ocraft.s2client.protocol.request.RequestGameInfo;
 import com.github.ocraft.s2client.protocol.request.RequestStep;
 import com.github.ocraft.s2client.protocol.response.*;
 import com.github.ocraft.s2client.protocol.spatial.Point2d;
 import com.github.ocraft.s2client.protocol.syntax.action.raw.ActionRawUnitCommandBuilder;
-import com.github.ocraft.s2client.protocol.unit.Tag;
 import com.github.ocraft.s2client.protocol.unit.Unit;
 
 import java.util.Arrays;
-import java.util.Optional;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.github.ocraft.s2client.protocol.action.Action.action;
 import static com.github.ocraft.s2client.protocol.action.ActionResult.SUCCESS;
 import static com.github.ocraft.s2client.protocol.action.raw.ActionRawUnitCommand.unitCommand;
-import static com.github.ocraft.s2client.protocol.data.Abilities.*;
+import static com.github.ocraft.s2client.protocol.data.Abilities.ATTACK;
+import static com.github.ocraft.s2client.protocol.data.Abilities.MOVE;
 import static com.github.ocraft.s2client.protocol.game.GameStatus.ENDED;
 import static com.github.ocraft.s2client.protocol.game.Race.TERRAN;
 import static com.github.ocraft.s2client.protocol.request.RequestAction.actions;
 import static com.github.ocraft.s2client.protocol.request.RequestJoinGame.joinGame;
 import static com.github.ocraft.s2client.protocol.request.RequestObservation.observation;
-import static com.github.ocraft.s2client.protocol.unit.Alliance.ENEMY;
-import static com.github.ocraft.s2client.protocol.unit.Alliance.SELF;
 
 public abstract class BaseBot {
 
     private S2Client client;
     private GameInfo info;
-    private Observation observation;
+    private GameObservation observation;
     private boolean lastActionSuccessful;
 
     public BaseBot(S2Client client) {
         this.client = client;
     }
+
+    ///// GAME INTERFACE /////
 
     public final void handle(Response response) {
         response.as(ResponseCreateGame.class).ifPresent(r -> client.request(joinGame().as(TERRAN)));
@@ -49,7 +50,7 @@ public abstract class BaseBot {
 
         // main game loop
         response.as(ResponseObservation.class).ifPresent(r -> {
-            observation = r.getObservation();
+            observation = new GameObservation(this, r.getObservation());
             if (r.getStatus() != ENDED) {
                 onStep();
                 client.request(RequestStep.nextStep());
@@ -62,6 +63,9 @@ public abstract class BaseBot {
 
     protected abstract void onStep();
 
+
+    ///// ACTIONS /////
+
     protected void moveUnits(Point2d target, BotUnit... units) {
         if (units.length != 0) {
             ActionRawUnitCommandBuilder action = unitCommand().forUnits(botUnits2Units(units)).useAbility(MOVE).target(target);
@@ -71,7 +75,8 @@ public abstract class BaseBot {
 
     protected void attackTarget(BotUnit target, BotUnit... units) {
         if (units.length != 0) {
-            client.request(actions().of(action().raw(unitCommand().forUnits(botUnits2Units(units)).useAbility(ATTACK).target(target.getTag()))));
+            client.request(actions().of(action().raw(unitCommand().forUnits(botUnits2Units(units))
+                    .useAbility(ATTACK).target(target.getTag()))));
         }
     }
 
@@ -79,24 +84,22 @@ public abstract class BaseBot {
         client.request(action);
     }
 
-    protected Unit[] getUnits() {
-        return observation.getRaw().get().getUnits().stream().filter(u -> u.getAlliance() == SELF).toArray(Unit[]::new);
+
+    ///// GETTER /////
+
+    protected List<BotUnit> getUnits() {
+        return observation.units.stream().filter(BotUnit::isMine).collect(Collectors.toList());
     }
 
-    protected Unit[] getIdleUnits() {
-        return observation.getRaw().get().getUnits().stream().filter(u -> u.getAlliance() == SELF)
-                .filter(u -> u.getOrders().isEmpty()).toArray(Unit[]::new);
+    protected List<BotUnit> getIdleUnits() {
+        return getUnits().stream().filter(u -> u.getOrders().isEmpty()).collect(Collectors.toList());
     }
 
-    protected Unit[] getVisibleEnemies() {
-        return observation.getRaw().get().getUnits().stream().filter(u -> u.getAlliance() == ENEMY).toArray(Unit[]::new);
+    protected List<BotUnit> getVisibleEnemies() {
+        return observation.units.stream().filter(BotUnit::isEnemy).collect(Collectors.toList());
     }
 
-    protected Optional<Unit> findByTag(Tag tag) {
-        return getObservation().getRaw().get().getUnits().stream().filter(u -> u.getTag().equals(tag)).findFirst();
-    }
-
-    protected Observation getObservation() {
+    protected GameObservation getObservation() {
         return observation;
     }
 
@@ -104,11 +107,18 @@ public abstract class BaseBot {
         return info;
     }
 
-    public boolean wasLastActionSuccessful() {
+    protected boolean wasLastActionSuccessful() {
         return lastActionSuccessful;
     }
 
+
+    ///// INTERNAL /////
+
     private Unit[] botUnits2Units(BotUnit[] units) {
-        return Arrays.stream(units).map(BotUnit::getUnit).toArray(Unit[]::new);
+        return Arrays.stream(units).map(BotUnit::getRawUnit).toArray(Unit[]::new);
+    }
+
+    private List<BotUnit> units2BotUnits(Stream<Unit> units) {
+         return units.map(u -> new BotUnit(this, u)).collect(Collectors.toList());
     }
 }

@@ -11,30 +11,32 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import static com.github.ocraft.s2client.protocol.unit.Alliance.ENEMY;
 import static com.github.ocraft.s2client.protocol.unit.Alliance.SELF;
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class BotUnit {
 
     private final BaseBot bot;
     private final Tag tag;
 
-    public BotUnit(BaseBot bot, Tag tag) {
+    BotUnit(BaseBot bot, Tag tag) {
         this.bot = bot;
         this.tag = tag;
     }
 
-    public BotUnit(BaseBot bot, Unit unit) {
+    BotUnit(BaseBot bot, Unit unit) {
         this(bot, unit.getTag());
     }
 
 
     ///// GETTER /////
 
-    public Unit getUnit() {
-        return findByTag(tag).get(); // TODO;
+    public Unit getRawUnit() {
+        return getByTag(tag);
     }
 
-    public List<UnitOrder> getOrderList() {
+    public List<UnitOrder> getOrders() {
         return getByTag(tag).getOrders();
     }
 
@@ -43,7 +45,11 @@ public class BotUnit {
     }
 
     public boolean isMine() {
-        return findByTag(tag).get().getAlliance() == SELF;
+        return getByTag(tag).getAlliance() == SELF;
+    }
+
+    public boolean isEnemy() {
+        return getByTag(tag).getAlliance() == ENEMY;
     }
 
     public UnitType getType() {
@@ -86,16 +92,19 @@ public class BotUnit {
         findByTag(tag).ifPresent(u -> bot.moveUnits(target, this));
     }
 
+    public void attack(BotUnit target) {
+        findByTag(tag).ifPresent(u -> bot.attackTarget(target, this));
+    }
+
 
     ///// INTERNAL /////
 
     private Unit getByTag(Tag tag) {
-        // TODO
-        return bot.getObservation().getRaw().get().getUnits().stream().filter(u -> u.getTag().equals(tag)).findFirst().get();
+        return findByTag(tag).orElseThrow(() -> new UnitNotFoundException("The specified unit is not visible or not alive."));
     }
 
     private Optional<Unit> findByTag(Tag tag) {
-        return bot.getObservation().getRaw().get().getUnits().stream().filter(u -> u.getTag().equals(tag)).findFirst();
+        return bot.getObservation().units.stream().filter(u -> u.getTag().equals(tag)).findFirst().map(BotUnit::getRawUnit);
     }
 
     Tag getTag() {
@@ -117,6 +126,6 @@ public class BotUnit {
 
     @Override
     public String toString() {
-        return ""; // TODO
+        return String.format("Unit[id=%s(%s), position=%s, health=%s]", tag, getRawUnit().getAlliance(), getPosition(), getHealth());
     }
 }
