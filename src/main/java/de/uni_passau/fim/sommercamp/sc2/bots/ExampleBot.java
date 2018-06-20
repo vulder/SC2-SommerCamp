@@ -23,7 +23,7 @@ public class ExampleBot extends BaseBot {
 
     @Override
     protected void onStep() {
-        if (runner != null && !runner.isAliveOrVisible()) {
+        if (runner != null && !runner.isAliveAndVisible()) {
             return;
         }
 
@@ -64,11 +64,11 @@ public class ExampleBot extends BaseBot {
     private void attack() {
         if (runner.getWeaponCooldown() > 0f) {
             if (needCooling) {
-                if (target.isAliveOrVisible()) {
+                if (target.isAliveAndVisible()) {
                      moveUnits(retreatPoint(runner.getPosition(), target.getPosition()), runner);
                 }
                 needCooling = false;
-            } else if (!target.isAliveOrVisible()) {
+            } else if (!target.isAliveAndVisible()) {
                 // target down or out of sight
                 attacking = false;
                 searching = true;

@@ -6,6 +6,9 @@ import org.kohsuke.args4j.Option;
 
 import java.net.URISyntaxException;
 
+/**
+ * Main entry point for stand-alone jar usage.
+ */
 public class Main {
 
     @Option(name = "-map",

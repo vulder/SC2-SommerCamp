@@ -1,5 +1,9 @@
 package de.uni_passau.fim.sommercamp.sc2;
 
+/**
+ * Exception for signaling that a unit was not found.
+ */
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class UnitNotFoundException extends RuntimeException {
 
     public UnitNotFoundException(String message) {

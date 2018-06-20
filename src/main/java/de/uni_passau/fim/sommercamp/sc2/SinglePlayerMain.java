@@ -17,10 +17,13 @@ import static com.github.ocraft.s2client.protocol.game.Race.TERRAN;
 import static com.github.ocraft.s2client.protocol.request.RequestCreateGame.createGame;
 import static com.github.ocraft.s2client.protocol.response.ResponseType.LEAVE_GAME;
 
+/**
+ * Entry point for Bot vs Computer single player games.
+ */
 public class SinglePlayerMain {
 
     public static void main(String[] args) throws URISyntaxException {
-      run("Marines_2v2_d.SC2Map", "ExampleBot");
+        run("Marines_2v2_d.SC2Map", "ExampleBot");
     }
 
     static void run(String map, String bot) throws URISyntaxException {

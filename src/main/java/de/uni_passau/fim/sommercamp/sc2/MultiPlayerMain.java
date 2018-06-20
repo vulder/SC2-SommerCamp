@@ -22,6 +22,9 @@ import static com.github.ocraft.s2client.protocol.request.RequestJoinGame.joinGa
 import static com.github.ocraft.s2client.protocol.response.ResponseType.QUIT_GAME;
 import static de.uni_passau.fim.sommercamp.sc2.Util.getMultipleBots;
 
+/**
+ * Entry point for Bot vs Bot multi player games.
+ */
 public class MultiPlayerMain {
 
     public static void main(String[] args) throws URISyntaxException {

@@ -11,6 +11,7 @@ import com.github.ocraft.s2client.protocol.unit.Unit;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -25,6 +26,9 @@ import static com.github.ocraft.s2client.protocol.request.RequestAction.actions;
 import static com.github.ocraft.s2client.protocol.request.RequestJoinGame.joinGame;
 import static com.github.ocraft.s2client.protocol.request.RequestObservation.observation;
 
+/**
+ * A BaseBot is the base class for all Starcraft II bots with the modified ocraft s2client API.
+ */
 public abstract class BaseBot {
 
     private S2Client client;
@@ -32,12 +36,22 @@ public abstract class BaseBot {
     private GameObservation observation;
     private boolean lastActionSuccessful;
 
+    /**
+     * Creates a new BaseBot for the given S2Client.
+     *
+     * @param client the client connection the this bot to the Starcraft II instance
+     */
     public BaseBot(S2Client client) {
         this.client = client;
     }
 
     ///// GAME INTERFACE /////
 
+    /**
+     * This method is called by the library to handle Responses sent by the game.
+     *
+     * @param response the Response to handle
+     */
     public final void handle(Response response) {
         response.as(ResponseCreateGame.class).ifPresent(r -> client.request(joinGame().as(TERRAN)));
         response.as(ResponseJoinGame.class).ifPresent(r -> client.request(RequestGameInfo.gameInfo()));
@@ -54,6 +68,7 @@ public abstract class BaseBot {
             if (r.getStatus() != ENDED) {
                 onStep();
                 client.request(RequestStep.nextStep());
+//            TODO check how to allow manual replays but exit the game gracefully
 //            } else {
 //                // Disabled to allow manual replays
 //                client.request(leaveGame());
@@ -61,11 +76,25 @@ public abstract class BaseBot {
         });
     }
 
+    /**
+     * This method is called on each step/once each game loop. When implementing a bot, place all logic and action here.
+     */
     protected abstract void onStep();
 
 
     ///// ACTIONS /////
 
+    /**
+     * Sends a MOVE request for the given BotUnits to the given map location.
+     * <p/>
+     * If the position is not valid, the request will fail to apply.
+     * If no (alive) units are supplied, no request will be sent.
+     *
+     * @param target a valid Point2d describing the target location on the map
+     * @param units  the BotUnits this action is sent to
+     * @see GameInfo#mapData GameInfo.mapData, for information on the map
+     * @see #wasLastActionSuccessful() wasLastActionSuccessful(), to check if the request was successful
+     */
     protected void moveUnits(Point2d target, BotUnit... units) {
         if (units.length != 0) {
             ActionRawUnitCommandBuilder action = unitCommand().forUnits(botUnits2Units(units)).useAbility(MOVE).target(target);
@@ -73,6 +102,16 @@ public abstract class BaseBot {
         }
     }
 
+    /**
+     * Sends ATTACK requests for the given BotUnits to attack the given BotUnit target.
+     * <p/>
+     * If the target is not alive or visible, the request will fail to apply.
+     * If no (alive) units are supplied, no request will be sent.
+     *
+     * @param target the target BotUnit
+     * @param units  the BotUnits this action is sent to
+     * @see #wasLastActionSuccessful() wasLastActionSuccessful(), to check if the request was successful
+     */
     protected void attackTarget(BotUnit target, BotUnit... units) {
         if (units.length != 0) {
             client.request(actions().of(action().raw(unitCommand().forUnits(botUnits2Units(units))
@@ -80,6 +119,11 @@ public abstract class BaseBot {
         }
     }
 
+    /**
+     * Send a raw request to the game.
+     *
+     * @param action the request to send
+     */
     protected void sendRawCommand(Request action) {
         client.request(action);
     }
@@ -87,26 +131,57 @@ public abstract class BaseBot {
 
     ///// GETTER /////
 
+    /**
+     * Gets a list of all BotUnits belonging to this bot.
+     *
+     * @return a list of BotUnits of this bot.
+     */
     protected List<BotUnit> getUnits() {
         return observation.units.stream().filter(BotUnit::isMine).collect(Collectors.toList());
     }
 
+    /**
+     * Gets a list of all BotUnits belonging to this bot, that currently have no orders.
+     *
+     * @return a list of BotUnits
+     */
     protected List<BotUnit> getIdleUnits() {
         return getUnits().stream().filter(u -> u.getOrders().isEmpty()).collect(Collectors.toList());
     }
 
+    /**
+     * Gets a list of all visible BotUnits that are classified as enemies.
+     *
+     * @return a list of BotUnits currently visible by the bot, classified a ENEMY
+     */
     protected List<BotUnit> getVisibleEnemies() {
         return observation.units.stream().filter(BotUnit::isEnemy).collect(Collectors.toList());
     }
 
+    /**
+     * Gets a GameObservation containing information about the current game state.
+     *
+     * @return a GameObservation describing the game state at the current game loop
+     */
     protected GameObservation getObservation() {
         return observation;
     }
 
+    /**
+     * Gets general information about the current game.
+     *
+     * @return static information about the current game
+     */
     protected GameInfo getInfo() {
         return info;
     }
 
+    /**
+     * Checks if the last sent action was successful.
+     * Note, that generally only the last action sent in each step is recorded.
+     *
+     * @return {@code true} if the last action sent to the game was a SUCCESS, {@code false} otherwise.
+     */
     protected boolean wasLastActionSuccessful() {
         return lastActionSuccessful;
     }
@@ -114,11 +189,25 @@ public abstract class BaseBot {
 
     ///// INTERNAL /////
 
+    /**
+     * Converts an array of BotUnits to an array of Units.
+     *
+     * @param units the BotUnits
+     * @return the underlying Units
+     * @see #units2BotUnits(Stream)
+     */
     private Unit[] botUnits2Units(BotUnit[] units) {
-        return Arrays.stream(units).map(BotUnit::getRawUnit).toArray(Unit[]::new);
+        return Arrays.stream(units).map(BotUnit::getUnit).filter(Optional::isPresent).map(Optional::get).toArray(Unit[]::new);
     }
 
+    /**
+     * Converts a stream of Units to a list of BotUnits
+     *
+     * @param units the Units
+     * @return the BotUnits wrapping the given units
+     * @see #botUnits2Units(BotUnit[])
+     */
     private List<BotUnit> units2BotUnits(Stream<Unit> units) {
-         return units.map(u -> new BotUnit(this, u)).collect(Collectors.toList());
+        return units.map(u -> new BotUnit(this, u)).collect(Collectors.toList());
     }
 }
