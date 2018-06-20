@@ -11,6 +11,7 @@ import com.github.ocraft.s2client.protocol.syntax.action.raw.ActionRawUnitComman
 import com.github.ocraft.s2client.protocol.unit.Tag;
 import com.github.ocraft.s2client.protocol.unit.Unit;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import static com.github.ocraft.s2client.protocol.action.Action.action;
@@ -61,22 +62,16 @@ public abstract class BaseBot {
 
     protected abstract void onStep();
 
-    protected void moveUnits(Point2d target, Unit... units) {
+    protected void moveUnits(Point2d target, BotUnit... units) {
         if (units.length != 0) {
-            ActionRawUnitCommandBuilder action = unitCommand().forUnits(units).useAbility(MOVE).target(target);
+            ActionRawUnitCommandBuilder action = unitCommand().forUnits(botUnits2Units(units)).useAbility(MOVE).target(target);
             client.request(actions().of(action().raw(action)));
         }
     }
 
-    protected void attackTarget(Tag target, Unit... units) {
+    protected void attackTarget(BotUnit target, BotUnit... units) {
         if (units.length != 0) {
-            client.request(actions().of(action().raw(unitCommand().forUnits(units).useAbility(ATTACK).target(target))));
-        }
-    }
-
-    protected void stopUnits(Unit... units) {
-        if (units.length != 0) {
-            client.request(actions().of(action().raw(unitCommand().forUnits(units).useAbility(STOP).build())));
+            client.request(actions().of(action().raw(unitCommand().forUnits(botUnits2Units(units)).useAbility(ATTACK).target(target.getTag()))));
         }
     }
 
@@ -101,7 +96,6 @@ public abstract class BaseBot {
         return getObservation().getRaw().get().getUnits().stream().filter(u -> u.getTag().equals(tag)).findFirst();
     }
 
-
     protected Observation getObservation() {
         return observation;
     }
@@ -112,5 +106,9 @@ public abstract class BaseBot {
 
     public boolean wasLastActionSuccessful() {
         return lastActionSuccessful;
+    }
+
+    private Unit[] botUnits2Units(BotUnit[] units) {
+        return Arrays.stream(units).map(BotUnit::getUnit).toArray(Unit[]::new);
     }
 }

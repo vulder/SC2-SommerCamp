@@ -1,15 +1,13 @@
 package de.uni_passau.fim.sommercamp.sc2.bots;
 
 import com.github.ocraft.s2client.api.S2Client;
-import com.github.ocraft.s2client.protocol.spatial.Point;
 import com.github.ocraft.s2client.protocol.spatial.Point2d;
-import com.github.ocraft.s2client.protocol.unit.Tag;
 import com.github.ocraft.s2client.protocol.unit.Unit;
 import de.uni_passau.fim.sommercamp.sc2.BaseBot;
+import de.uni_passau.fim.sommercamp.sc2.BotUnit;
 
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Optional;
 
 public class ExampleBot extends BaseBot {
 
@@ -17,8 +15,8 @@ public class ExampleBot extends BaseBot {
     private boolean attacking = false;
     private boolean needCooling = false;
 
-    private Tag runnerTag;
-    private Tag targetTag;
+    private BotUnit runner;
+    private BotUnit target;
     private int leg = 0;
 
     public ExampleBot(S2Client client) {
@@ -27,12 +25,16 @@ public class ExampleBot extends BaseBot {
 
     @Override
     protected void onStep() {
+        if (runner != null && !runner.isAliveOrVisible()) {
+            return;
+        }
+
         if (!searching & !attacking) {
             searching = true;
 
-            Unit runner = getUnits()[0];
-            runnerTag = runner.getTag();
-            Point base = runner.getPosition();
+            Unit r = getUnits()[0];
+            runner = new BotUnit(this, r.getTag());
+            Point2d base = runner.getPosition();
             if (base.getX() > getInfo().mapData.getMapSize().getX() / 2) {
                 if (base.getY() > getInfo().mapData.getMapSize().getY() / 2) {
                     leg = 1;
@@ -63,35 +65,28 @@ public class ExampleBot extends BaseBot {
     }
 
     private void attack() {
-        Optional<Unit> runnerOpt = findByTag(runnerTag);
-        if (!runnerOpt.isPresent()) {
-            return;
-        }
-        Unit runner = runnerOpt.get();
-
-        if (runner.getWeaponCooldown().orElse(0f) > 0f) {
-            Optional<Unit> target = findByTag(targetTag);
+        if (runner.getWeaponCooldown() > 0f) {
             if (needCooling) {
-                target.ifPresent(t -> moveUnits(retreatPoint(runner.getPosition(), t.getPosition()), runner));
+                if (target.isAliveOrVisible()) {
+                     moveUnits(retreatPoint(runner.getPosition(), target.getPosition()), runner);
+                }
                 needCooling = false;
-            } else if (!target.isPresent()) {
+            } else if (!target.isAliveOrVisible()) {
                 // target down or out of sight
                 attacking = false;
                 searching = true;
             }
         } else if (getVisibleEnemies().length != 0) {
-            targetTag = Arrays.stream(getVisibleEnemies()).min(Comparator.comparing(e -> e.getHealth().orElse(1f))).get().getTag();
-            attackTarget(targetTag, runner);
+            target = new BotUnit(this, Arrays.stream(getVisibleEnemies()).min(Comparator.comparing(e -> e.getHealth().orElse(1f))).get());
+            attackTarget(target, runner);
             needCooling = true;
         }
     }
 
     private void patrol() {
-        Optional<Unit> runnerOpt = findByTag(runnerTag);
-        if (!runnerOpt.isPresent() || !runnerOpt.get().getOrders().isEmpty()) {
+        if (!runner.getOrderList().isEmpty()) {
             return;
         }
-        Unit runner = runnerOpt.get();
 
         int border = 4;
         int maxX = getInfo().mapData.getMapSize().getX() - border;
@@ -120,7 +115,7 @@ public class ExampleBot extends BaseBot {
         leg = ++leg % 4;
     }
 
-    private Point2d retreatPoint(Point self, Point enemy) {
+    private Point2d retreatPoint(Point2d self, Point2d enemy) {
         float xDist = (enemy.getX() - self.getX());
         float yDist = (enemy.getY() - self.getY());
         float mag = (float) Math.sqrt(xDist * xDist + yDist * yDist);
