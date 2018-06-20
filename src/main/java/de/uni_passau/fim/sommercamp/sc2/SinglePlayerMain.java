@@ -20,13 +20,17 @@ import static com.github.ocraft.s2client.protocol.response.ResponseType.LEAVE_GA
 public class SinglePlayerMain {
 
     public static void main(String[] args) throws URISyntaxException {
+      run("Marines_2v2_d.SC2Map", "ExampleBot");
+    }
+
+    static void run(String map, String bot) throws URISyntaxException {
         S2Controller game = starcraft2Game().launch();
         S2Client client = starcraft2Client().connectTo(game).traced(true).start();
 
-        BaseBot player = Util.getBot(client);
+        BaseBot player = Util.getBotByName(bot, client);
 
         client.request(createGame()
-                .onLocalMap(LocalMap.of(Paths.get(ClassLoader.getSystemResource("Marines_2v2_d.SC2Map").toURI())))
+                .onLocalMap(LocalMap.of(Paths.get(ClassLoader.getSystemResource(map).toURI())))
                 .withPlayerSetup(participant(), computer(TERRAN, VERY_EASY)));
 
         client.responseStream().takeWhile(Responses.isNot(LEAVE_GAME)).subscribe(player::handle);

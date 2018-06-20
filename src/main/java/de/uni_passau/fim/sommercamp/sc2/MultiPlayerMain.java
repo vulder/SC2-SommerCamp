@@ -25,6 +25,10 @@ import static de.uni_passau.fim.sommercamp.sc2.Util.getMultipleBots;
 public class MultiPlayerMain {
 
     public static void main(String[] args) throws URISyntaxException {
+        run("Marines_2v2_d.SC2Map", "ExampleBot", "ExampleBot");
+    }
+
+    static void run(String map, String botA, String botB) throws URISyntaxException {
 
         S2Controller game01 = starcraft2Game().launch();
         S2Client client01 = starcraft2Client().connectTo(game01).traced(true).start();
@@ -33,10 +37,10 @@ public class MultiPlayerMain {
         S2Client client02 = starcraft2Client().connectTo(game02).traced(true).start();
 
         client01.request(createGame()
-                .onLocalMap(LocalMap.of(Paths.get(ClassLoader.getSystemResource("Marines_2v2_d.SC2Map").toURI())))
+                .onLocalMap(LocalMap.of(Paths.get(ClassLoader.getSystemResource(map).toURI())))
                 .withPlayerSetup(participant(), participant()));
 
-        List<BaseBot> players = getMultipleBots(2, Arrays.asList(client01, client02));
+        List<BaseBot> players = getMultipleBots(Arrays.asList(botA, botB), Arrays.asList(client01, client02));
         MultiplayerOptions multiplayerOptions = multiplayerSetupFor(S2Controller.lastPort(), 2);
 
         client01.request(joinGame().as(TERRAN).use(interfaces().raw()).with(multiplayerOptions));

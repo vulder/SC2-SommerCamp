@@ -20,6 +20,7 @@ allprojects {
 }
 
 dependencies {
+    compile group: 'args4j', name: 'args4j', version: '2.33'
     compile group: 'com.github.ocraft', name: 'ocraft-s2client', version: '0.1.4-SNAPSHOT'
     compile group: 'com.google.protobuf', name: 'protobuf-java', version: '3.5.1'
     compile group: 'com.google.protobuf', name: 'protobuf-java-util', version: '3.5.1'
@@ -37,3 +38,25 @@ dependencies {
     compile group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.21'
 }
 
+sourceSets {
+    main {
+        java {
+            srcDir 'src/java/'
+            exclude '**/bots/**'
+        }
+    }
+}
+
+jar {
+    manifest {
+        attributes(
+                'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+                'Main-Class': "de.uni_passau.fim.sommercamp.sc2.Main"
+        )
+    }
+}
+
+startScripts {
+    applicationName = rootProject.name
+    mainClassName = "de.uni_passau.fim.sommercamp.sc2.Main"
+}

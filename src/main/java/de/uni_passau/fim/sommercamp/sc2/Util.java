@@ -31,6 +31,15 @@ public final class Util {
                 .map(c -> instantiate(c, clientIterator.next())).collect(Collectors.toList());
     }
 
+    static List<BaseBot> getMultipleBots(List<String> classNames,  List<S2Client> clients) {
+        if (classNames.size() != clients.size()) {
+            throw new IllegalArgumentException("Need separate client for every bot.");
+        }
+
+        Iterator<S2Client> clientIterator = clients.iterator();
+        return classNames.stream().map(name -> getBotByName(name, clientIterator.next())).collect(Collectors.toList());
+    }
+
     static BaseBot getBotByName(String name, S2Client client) {
         return bots.stream().filter(c -> c.getCanonicalName().equals(name)).findFirst().map(c -> instantiate(c, client)).get();
     }
