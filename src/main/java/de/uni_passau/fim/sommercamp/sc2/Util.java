@@ -69,7 +69,7 @@ public final class Util {
      * @return the bot
      */
     static BaseBot getBotByName(String name, S2Client client) {
-        return bots.stream().filter(c -> c.getCanonicalName().equals(name)).findFirst().map(c -> instantiate(c, client)).get();
+        return bots.stream().filter(c -> c.getSimpleName().equals(name)).findFirst().map(c -> instantiate(c, client)).get();
     }
 
     /**
