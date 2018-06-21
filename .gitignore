@@ -64,4 +64,4 @@ build/
 .vertx/
 
 ### Lib files
-!libs/*.jar
+!libs/**/*.jar
