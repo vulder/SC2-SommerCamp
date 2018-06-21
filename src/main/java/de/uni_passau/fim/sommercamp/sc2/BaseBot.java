@@ -12,6 +12,7 @@ import com.github.ocraft.s2client.protocol.unit.Unit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -34,7 +35,7 @@ public abstract class BaseBot {
     private S2Client client;
     private GameInfo info;
     private GameObservation observation;
-    private boolean lastActionSuccessful;
+    private final AtomicBoolean lastActionSuccessful = new AtomicBoolean(true);
 
     /**
      * Creates a new BaseBot for the given S2Client.
@@ -56,7 +57,11 @@ public abstract class BaseBot {
         response.as(ResponseCreateGame.class).ifPresent(r -> client.request(joinGame().as(TERRAN)));
         response.as(ResponseJoinGame.class).ifPresent(r -> client.request(RequestGameInfo.gameInfo()));
         response.as(ResponseStep.class).ifPresent(r -> client.request(observation()));
-        response.as(ResponseAction.class).ifPresent(r -> lastActionSuccessful = r.getResults().stream().allMatch(ar -> ar == SUCCESS));
+        response.as(ResponseAction.class).ifPresent(r -> {
+            synchronized (lastActionSuccessful) {
+                lastActionSuccessful.set(r.getResults().stream().allMatch(ar -> ar == SUCCESS));
+            }
+        });
         response.as(ResponseGameInfo.class).ifPresent(r -> {
             info = new GameInfo(r.getPlayersInfo(), r.getMapName(), r.getStartRaw().orElse(null));
             client.request(observation());
@@ -183,7 +188,9 @@ public abstract class BaseBot {
      * @return {@code true} if the last action sent to the game was a SUCCESS, {@code false} otherwise.
      */
     protected boolean wasLastActionSuccessful() {
-        return lastActionSuccessful;
+        synchronized (lastActionSuccessful) {
+            return lastActionSuccessful.get();
+        }
     }
 
 
