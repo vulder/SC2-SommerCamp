@@ -149,27 +149,21 @@ public class BotUnit {
 
     /**
      * Checks if the unit is selected in the UI.
-     * <p>
-     * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
-     * {@link UnitNotFoundException} will be thrown.
      *
-     * @return {@code true}, if this unit was selected
+     * @return {@code true}, if this unit {@link #isAliveAndVisible() is alive and visible} and was selected
      */
     public boolean isSelected() {
-        return getByTag(tag).getSelected().orElse(false);
+        return findByTag(tag).flatMap(Unit::getSelected).orElse(false);
     }
 
     /**
      * Gets the health of the unit.
-     * <p>
-     * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
-     * {@link UnitNotFoundException} will be thrown.
      *
      * @return the health of the unit
      * @see #getMaxHealth() getMaxHealth(), for the maximal health of this unit
      */
     public float getHealth() {
-        return findByTag(tag).map(u -> u.getHealth().orElse(0f)).orElse(0f);
+        return findByTag(tag).flatMap(Unit::getHealth).orElse(0f);
     }
 
     /**
@@ -178,23 +172,23 @@ public class BotUnit {
      * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
      * {@link UnitNotFoundException} will be thrown.
      *
-     * @return the maximal health of this unit
+     * @return the maximal health of this unit or {@code -1} if it has no available health data
      */
     public float getMaxHealth() {
-        return getByTag(tag).getHealthMax().orElse(0f);
+        return getByTag(tag).getHealthMax().orElse(-1f);
     }
 
     // TODO is there a fixed relation between steps and in-game seconds?
     // if so, provide documentation, (if not - not likely - we would be screwed, because you could just wait until the
     // cooldown is done in each step)
-
     /**
      * Gets the time, until the weapon can be used again.
      * <p>
      * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
      * {@link UnitNotFoundException} will be thrown.
      *
-     * @return the time in seconds until the weapon can be used again
+     * @return the time in seconds until the weapon can be used again or {@link Float#MAX_VALUE} if this unit has no
+     * weapon cooldown
      */
     public float getWeaponCooldown() {
         return getByTag(tag).getWeaponCooldown().orElse(Float.MAX_VALUE);
@@ -202,14 +196,12 @@ public class BotUnit {
 
     /**
      * Checks if this unit has engaged on a target.
-     * <p>
-     * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
-     * {@link UnitNotFoundException} will be thrown.
      *
-     * @return {@code true}, if the unit is engaged on a target, {@code false} otherwise
+     * @return {@code true}, if the unit {@link #isAliveAndVisible() is alive and visible} and is engaged on a target,
+     * {@code false} otherwise
      */
     public Optional<BotUnit> getEngagedTarget() {
-        return getByTag(tag).getEngagedTargetTag().map(t -> new BotUnit(bot, t));
+        return findByTag(tag).flatMap(u -> u.getEngagedTargetTag().map(t -> new BotUnit(bot, t)));
     }
 
 
