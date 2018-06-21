@@ -257,7 +257,8 @@ public class BotUnit {
      * @return optionally a Unit with this tag, of an empty Optional, if there is none
      */
     private Optional<Unit> findByTag(Tag tag) {
-        return bot.getObservation().units.stream().filter(u -> u.getTag().equals(tag)).findFirst().map(BotUnit::getRawUnit);
+        return bot.getObservation().getRawObservation().getRaw().get().getUnits().stream()
+                .filter(u -> u.getTag().equals(tag)).findFirst();
     }
 
     /**
