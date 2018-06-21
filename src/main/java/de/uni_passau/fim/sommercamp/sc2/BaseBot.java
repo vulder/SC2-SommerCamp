@@ -91,7 +91,7 @@ public abstract class BaseBot {
 
     /**
      * Sends a MOVE request for the given BotUnits to the given map location.
-     * <p/>
+     * <p>
      * If the position is not valid, the request will fail to apply.
      * If no (alive) units are supplied, no request will be sent.
      *
@@ -109,7 +109,7 @@ public abstract class BaseBot {
 
     /**
      * Sends ATTACK requests for the given BotUnits to attack the given BotUnit target.
-     * <p/>
+     * <p>
      * If the target is not alive or visible, the request will fail to apply.
      * If no (alive) units are supplied, no request will be sent.
      *

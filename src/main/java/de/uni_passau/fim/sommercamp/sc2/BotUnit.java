@@ -50,7 +50,7 @@ public class BotUnit {
 
     /**
      * Gets the underlying Unit for direct access of additional data.
-     * <p/>
+     * <p>
      * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
      * {@link UnitNotFoundException} will be thrown.
      *
@@ -62,7 +62,7 @@ public class BotUnit {
 
     /**
      * Gets a list of all queued Orders issued to this unit.
-     * <p/>
+     * <p>
      * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
      * {@link UnitNotFoundException} will be thrown.
      *
@@ -87,7 +87,7 @@ public class BotUnit {
 
     /**
      * Checks if this unit belongs to this bot.
-     * <p/>
+     * <p>
      * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
      * {@link UnitNotFoundException} will be thrown.
      *
@@ -99,7 +99,7 @@ public class BotUnit {
 
     /**
      * Checks if this unit does not belong to this bot and is marked as ENEMY.
-     * <p/>
+     * <p>
      * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
      * {@link UnitNotFoundException} will be thrown.
      *
@@ -111,7 +111,7 @@ public class BotUnit {
 
     /**
      * Gets the type of this unit.
-     * <p/>
+     * <p>
      * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
      * {@link UnitNotFoundException} will be thrown.
      *
@@ -123,7 +123,7 @@ public class BotUnit {
 
     /**
      * Gets the position on the map grid, at which this unit is currently.
-     * <p/>
+     * <p>
      * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
      * {@link UnitNotFoundException} will be thrown.
      *
@@ -137,7 +137,7 @@ public class BotUnit {
 
     /**
      * Get the angle (in radians) the unit faces.
-     * <p/>
+     * <p>
      * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
      * {@link UnitNotFoundException} will be thrown.
      *
@@ -149,7 +149,7 @@ public class BotUnit {
 
     /**
      * Checks if the unit is selected in the UI.
-     * <p/>
+     * <p>
      * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
      * {@link UnitNotFoundException} will be thrown.
      *
@@ -161,7 +161,7 @@ public class BotUnit {
 
     /**
      * Gets the health of the unit.
-     * <p/>
+     * <p>
      * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
      * {@link UnitNotFoundException} will be thrown.
      *
@@ -174,7 +174,7 @@ public class BotUnit {
 
     /**
      * Gets health of this unit at the beginning of the game.
-     * <p/>
+     * <p>
      * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
      * {@link UnitNotFoundException} will be thrown.
      *
@@ -190,7 +190,7 @@ public class BotUnit {
 
     /**
      * Gets the time, until the weapon can be used again.
-     * <p/>
+     * <p>
      * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
      * {@link UnitNotFoundException} will be thrown.
      *
@@ -202,7 +202,7 @@ public class BotUnit {
 
     /**
      * Checks if this unit has engaged on a target.
-     * <p/>
+     * <p>
      * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
      * {@link UnitNotFoundException} will be thrown.
      *
