@@ -10,6 +10,7 @@ import java.net.URISyntaxException;
  * Main entry point for stand-alone jar usage.
  */
 public class Main {
+    private static String MAP_EXTENSION = ".SC2Map";
 
     @Option(name = "-map",
             metaVar = "MAP",
@@ -46,6 +47,10 @@ public class Main {
             parser.parseArgument(arguments);
         } catch (CmdLineException clEx) {
             System.out.println("ERROR: Unable to parse command-line options: " + clEx);
+        }
+
+        if (!mapName.endsWith(MAP_EXTENSION)) {
+            mapName += MAP_EXTENSION;
         }
 
         if (multiPlayer) {
