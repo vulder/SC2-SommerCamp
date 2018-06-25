@@ -4,9 +4,9 @@ import com.github.ocraft.s2client.api.S2Client;
 import com.github.ocraft.s2client.api.controller.S2Controller;
 import com.github.ocraft.s2client.api.rx.Responses;
 import com.github.ocraft.s2client.protocol.game.LocalMap;
+import org.apache.commons.io.IOUtils;
 
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
+import java.io.IOException;
 
 import static com.github.ocraft.s2client.api.S2Client.starcraft2Client;
 import static com.github.ocraft.s2client.api.controller.S2Controller.starcraft2Game;
@@ -22,18 +22,18 @@ import static com.github.ocraft.s2client.protocol.response.ResponseType.LEAVE_GA
  */
 public class SinglePlayerMain {
 
-    public static void main(String[] args) throws URISyntaxException {
+    public static void main(String[] args) throws IOException {
         run("Marines_2v2_d.SC2Map", "ExampleBot");
     }
 
-    static void run(String map, String bot) throws URISyntaxException {
+    static void run(String map, String bot) throws IOException {
         S2Controller game = starcraft2Game().launch();
         S2Client client = starcraft2Client().connectTo(game).traced(true).start();
 
         BaseBot player = Util.getBotByName(bot, client);
 
         client.request(createGame()
-                .onLocalMap(LocalMap.of(Paths.get(ClassLoader.getSystemResource(map).toURI())))
+                .onLocalMap(LocalMap.of(IOUtils.toByteArray(ClassLoader.getSystemResourceAsStream(map))))
                 .withPlayerSetup(participant(), computer(TERRAN, VERY_EASY)));
 
         client.responseStream().takeWhile(Responses.isNot(LEAVE_GAME)).subscribe(player::handle);

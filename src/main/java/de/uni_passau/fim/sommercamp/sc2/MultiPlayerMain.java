@@ -5,9 +5,9 @@ import com.github.ocraft.s2client.api.controller.S2Controller;
 import com.github.ocraft.s2client.api.rx.Responses;
 import com.github.ocraft.s2client.protocol.game.LocalMap;
 import com.github.ocraft.s2client.protocol.game.MultiplayerOptions;
+import org.apache.commons.io.IOUtils;
 
-import java.net.URISyntaxException;
-import java.nio.file.Paths;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,11 +27,11 @@ import static de.uni_passau.fim.sommercamp.sc2.Util.getMultipleBots;
  */
 public class MultiPlayerMain {
 
-    public static void main(String[] args) throws URISyntaxException {
+    public static void main(String[] args) throws IOException {
         run("Marines_2v2_d.SC2Map", "ExampleBot", "ExampleBot");
     }
 
-    static void run(String map, String botA, String botB) throws URISyntaxException {
+    static void run(String map, String botA, String botB) throws IOException {
 
         S2Controller game01 = starcraft2Game().launch();
         S2Client client01 = starcraft2Client().connectTo(game01).traced(true).start();
@@ -40,7 +40,7 @@ public class MultiPlayerMain {
         S2Client client02 = starcraft2Client().connectTo(game02).traced(true).start();
 
         client01.request(createGame()
-                .onLocalMap(LocalMap.of(Paths.get(ClassLoader.getSystemResource(map).toURI())))
+                .onLocalMap(LocalMap.of(IOUtils.toByteArray(ClassLoader.getSystemResourceAsStream(map))))
                 .withPlayerSetup(participant(), participant()));
 
         List<BaseBot> players = getMultipleBots(Arrays.asList(botA, botB), Arrays.asList(client01, client02));

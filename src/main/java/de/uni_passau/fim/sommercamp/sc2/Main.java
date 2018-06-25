@@ -4,7 +4,7 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
-import java.net.URISyntaxException;
+import java.io.IOException;
 
 /**
  * Main entry point for stand-alone jar usage.
@@ -34,7 +34,7 @@ public class Main {
             usage = "This activates the 'Bot vs. Bot' mode, you need to specify both bots.")
     private boolean multiPlayer = false;
 
-    private void doMain(final String[] arguments) throws URISyntaxException {
+    private void doMain(final String[] arguments) throws IOException {
 
         final CmdLineParser parser = new CmdLineParser(this);
 
@@ -65,7 +65,7 @@ public class Main {
 
         try {
             instance.doMain(args);
-        } catch (URISyntaxException e) {
+        } catch (Exception e) {
             System.out.println("ERROR: Exception encountered: " + e);
         }
     }

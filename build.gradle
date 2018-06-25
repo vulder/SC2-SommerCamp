@@ -25,6 +25,7 @@ dependencies {
     compile group: 'com.github.ocraft', name: 'ocraft-s2client', version: '0.1.5-SNAPSHOT'
 
     compile group: 'args4j', name: 'args4j', version: '2.33'
+    compile group: 'commons-io', name: 'commons-io', version: '2.6'
     compile group: 'org.reflections', name: 'reflections', version: '0.9.11'
 }
 
