@@ -52,7 +52,7 @@ public class GameObservation {
     /**
      * Gets the game loop count.
      *
-     * @return the number of game loop passed since the start of the game
+     * @return the number of game loop/in-game seconds that have passed since the start of the game
      */
     public long getGameLoop() {
         return gameLoop;

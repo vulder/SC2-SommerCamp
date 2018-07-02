@@ -178,17 +178,14 @@ public class BotUnit {
         return getByTag(tag).getHealthMax().orElse(-1f);
     }
 
-    // TODO is there a fixed relation between steps and in-game seconds?
-    // if so, provide documentation, (if not - not likely - we would be screwed, because you could just wait until the
-    // cooldown is done in each step)
     /**
      * Gets the time, until the weapon can be used again.
      * <p>
      * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
      * {@link UnitNotFoundException} will be thrown.
      *
-     * @return the time in seconds until the weapon can be used again or {@link Float#MAX_VALUE} if this unit has no
-     * weapon cooldown
+     * @return the time in in-game seconds/game loops until the weapon can be used again or {@link Float#MAX_VALUE} if
+     * this unit has no weapon cooldown
      */
     public float getWeaponCooldown() {
         return getByTag(tag).getWeaponCooldown().orElse(Float.MAX_VALUE);
@@ -209,6 +206,8 @@ public class BotUnit {
 
     /**
      * Sends a MOVE request, to move this unit to the specified position.
+     * <p>
+     * Note, will only be successful if this unit is {@link #isMine() controlled by this bot}.
      *
      * @param target a valid position on the map
      * @see GameInfo#mapData GameInfo.mapData, for information on the map
@@ -220,6 +219,8 @@ public class BotUnit {
 
     /**
      * Sends a ATTACK request, to attack the given (enemy) unit by this unit.
+     * <p>
+     * Note, will only be successful if this unit is {@link #isMine() controlled by this bot}.
      *
      * @param target the target enemy unit
      * @see BaseBot#attackTarget(BotUnit, BotUnit...)
