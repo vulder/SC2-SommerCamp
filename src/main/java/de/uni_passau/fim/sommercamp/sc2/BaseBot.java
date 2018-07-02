@@ -142,7 +142,7 @@ public abstract class BaseBot {
      * @return a list of BotUnits of this bot.
      */
     protected List<BotUnit> getUnits() {
-        return observation.units.stream().filter(BotUnit::isMine).collect(Collectors.toList());
+        return observation.getUnits().stream().filter(BotUnit::isMine).collect(Collectors.toList());
     }
 
     /**
@@ -160,7 +160,7 @@ public abstract class BaseBot {
      * @return a list of BotUnits currently visible by the bot, classified a ENEMY
      */
     protected List<BotUnit> getVisibleEnemies() {
-        return observation.units.stream().filter(BotUnit::isEnemy).collect(Collectors.toList());
+        return observation.getUnits().stream().filter(BotUnit::isEnemy).collect(Collectors.toList());
     }
 
     /**

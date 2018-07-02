@@ -32,14 +32,14 @@ public class ExampleBot extends BaseBot {
 
             runner = getUnits().get(0);
             Point2d base = runner.getPosition();
-            if (base.getX() > getInfo().mapData.getMapSize().getX() / 2) {
-                if (base.getY() > getInfo().mapData.getMapSize().getY() / 2) {
+            if (base.getX() > getInfo().getMapData().getMapSize().getX() / 2) {
+                if (base.getY() > getInfo().getMapData().getMapSize().getY() / 2) {
                     leg = 1;
                 } else {
                     leg = 2;
                 }
             } else {
-                if (base.getY() > getInfo().mapData.getMapSize().getY() / 2) {
+                if (base.getY() > getInfo().getMapData().getMapSize().getY() / 2) {
                     leg = 0;
                 } else {
                     leg = 3;
@@ -86,9 +86,9 @@ public class ExampleBot extends BaseBot {
         }
 
         int border = 4;
-        int maxX = getInfo().mapData.getMapSize().getX() - border;
+        int maxX = getInfo().getMapData().getMapSize().getX() - border;
         int minX = border;
-        int maxY = getInfo().mapData.getMapSize().getY() - border;
+        int maxY = getInfo().getMapData().getMapSize().getY() - border;
         int minY = border;
 
         switch (leg) {

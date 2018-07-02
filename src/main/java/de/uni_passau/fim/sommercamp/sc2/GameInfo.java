@@ -13,25 +13,9 @@ import java.util.List;
  */
 public class GameInfo {
 
-    /**
-     * Information about the players.
-     *
-     * @see PlayerInfo#getPlayerType()
-     * @see PlayerInfo#getDifficulty()
-     */
-    public final List<PlayerInfo> playersInfo;
-
-    /**
-     * The name of the map of hte current game.
-     */
-    public final String mapName;
-
-    /**
-     * Information about the map.
-     *
-     * @see StartRaw#getMapSize()
-     */
-    public final StartRaw mapData;
+    private final List<PlayerInfo> playersInfo;
+    private final String mapName;
+    private final StartRaw mapData;
 
     /**
      * Creates a new GameInfo based on the given data.
@@ -44,5 +28,35 @@ public class GameInfo {
         this.playersInfo = Collections.unmodifiableList(new ArrayList<>(playersInfo));
         this.mapName = mapName;
         this.mapData = mapData;
+    }
+
+    /**
+     * Gets information about all players.
+     *
+     * @return a list of raw info objects about the players
+     * @see PlayerInfo#getPlayerType()
+     * @see PlayerInfo#getDifficulty()
+     */
+    public List<PlayerInfo> getPlayersInfo() {
+        return playersInfo;
+    }
+
+    /**
+     * Gets the name of the map of the current game.
+     *
+     * @return the name of the map
+     */
+    public String getMapName() {
+        return mapName;
+    }
+
+    /**
+     * Gets information about the map.
+     *
+     * @return raw data about the map
+     * @see StartRaw#getMapSize()
+     */
+    public StartRaw getMapData() {
+        return mapData;
     }
 }

@@ -12,16 +12,8 @@ import java.util.stream.Collectors;
 public class GameObservation {
     private final BaseBot bot;
     private final Observation observation;
-
-    /**
-     * A list of all currently visible units.
-     */
-    public final List<BotUnit> units;
-
-    /**
-     * The game loop count.
-     */
-    public final long gameLoop;
+    private final List<BotUnit> units;
+    private final long gameLoop;
 
     /**
      * Creates a new GameObservation with the current game state.
@@ -55,5 +47,23 @@ public class GameObservation {
      */
     public Observation getRawObservation() {
         return observation;
+    }
+
+    /**
+     * Gets the game loop count.
+     *
+     * @return the number of game loop passed since the start of the game
+     */
+    public long getGameLoop() {
+        return gameLoop;
+    }
+
+    /**
+     * Gets a list of all currently visible units.
+     *
+     * @return the list of units
+     */
+    public List<BotUnit> getUnits() {
+        return units;
     }
 }
