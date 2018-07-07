@@ -27,6 +27,8 @@ dependencies {
     compile group: 'args4j', name: 'args4j', version: '2.33'
     compile group: 'commons-io', name: 'commons-io', version: '2.6'
     compile group: 'org.reflections', name: 'reflections', version: '0.9.11'
+
+    testCompile 'junit:junit:4.12'
 }
 
 sourceSets {
