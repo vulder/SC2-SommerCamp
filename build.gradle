@@ -58,7 +58,7 @@ publishing {
     repositories {
         maven {
             name "projectIncludes"
-            url "../SC2Bots/libs"
+            url "../SC-Bots/libs"
         }
     }
 }
