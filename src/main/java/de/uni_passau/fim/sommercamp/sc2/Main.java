@@ -4,6 +4,7 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -40,6 +41,15 @@ public class Main {
                     "by delaying bots that are too fast.")
     private int framerate = 20;
 
+    enum AiMode {
+        OFF, DEFENSIVE, OFFENSIVE
+    }
+
+    @Option(name = "-ai",
+            metaVar = "AI_MODE",
+            usage = "Sets the ai to {OFF, DEFENSIVE, OFFENSIVE} if available.")
+    private AiMode ai = AiMode.OFF;
+
     private void doMain(final String[] arguments) throws IOException {
 
         final CmdLineParser parser = new CmdLineParser(this);
@@ -59,6 +69,16 @@ public class Main {
 
         if (!mapName.endsWith(MAP_EXTENSION)) {
             mapName += MAP_EXTENSION;
+        }
+        switch (ai) {
+            case OFF:
+                break; // nothing to do
+            case DEFENSIVE:
+            case OFFENSIVE:
+                if (ClassLoader.getSystemResource(ai.name().toLowerCase() + File.separator + mapName) != null) {
+                        mapName = ai.name().toLowerCase() + File.separator + mapName;
+                }
+                break;
         }
 
         if (multiPlayer) {
