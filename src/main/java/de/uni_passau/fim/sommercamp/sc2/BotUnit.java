@@ -2,10 +2,10 @@ package de.uni_passau.fim.sommercamp.sc2;
 
 import com.github.ocraft.s2client.protocol.data.UnitType;
 import com.github.ocraft.s2client.protocol.spatial.Point;
-import com.github.ocraft.s2client.protocol.spatial.Point2d;
 import com.github.ocraft.s2client.protocol.unit.Tag;
 import com.github.ocraft.s2client.protocol.unit.Unit;
 import com.github.ocraft.s2client.protocol.unit.UnitOrder;
+import de.uni_passau.fim.sommercamp.sc2.util.Vec2;
 
 import java.util.List;
 import java.util.Objects;
@@ -127,12 +127,12 @@ public class BotUnit {
      * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
      * {@link UnitNotFoundException} will be thrown.
      *
-     * @return a Point2d representing the position
+     * @return a Vec2 representing the position
      * @see GameInfo#mapData GameInfo.mapData, for the map grid
      */
-    public Point2d getPosition() {
+    public Vec2 getPosition() {
         Point position = getByTag(tag).getPosition();
-        return Point2d.of(position.getX(), position.getY());
+        return Vec2.of(position.getX(), position.getY());
     }
 
     /**
@@ -211,9 +211,9 @@ public class BotUnit {
      *
      * @param target a valid position on the map
      * @see GameInfo#mapData GameInfo.mapData, for information on the map
-     * @see BaseBot#moveUnits(Point2d, BotUnit...)
+     * @see BaseBot#moveUnits(Vec2, BotUnit...)
      */
-    public void move(Point2d target) {
+    public void move(Vec2 target) {
         findByTag(tag).ifPresent(u -> bot.moveUnits(target, this));
     }
 

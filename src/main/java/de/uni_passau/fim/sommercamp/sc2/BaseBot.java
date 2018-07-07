@@ -5,9 +5,9 @@ import com.github.ocraft.s2client.protocol.request.Request;
 import com.github.ocraft.s2client.protocol.request.RequestGameInfo;
 import com.github.ocraft.s2client.protocol.request.RequestStep;
 import com.github.ocraft.s2client.protocol.response.*;
-import com.github.ocraft.s2client.protocol.spatial.Point2d;
 import com.github.ocraft.s2client.protocol.syntax.action.raw.ActionRawUnitCommandBuilder;
 import com.github.ocraft.s2client.protocol.unit.Unit;
+import de.uni_passau.fim.sommercamp.sc2.util.Vec2;
 
 import java.util.Arrays;
 import java.util.List;
@@ -101,14 +101,14 @@ public abstract class BaseBot {
      * If the position is not valid, the request will fail to apply.
      * If no (alive) units are supplied, no request will be sent.
      *
-     * @param target a valid Point2d describing the target location on the map
+     * @param target a valid Vec2 describing the target location on the map
      * @param units  the BotUnits this action is sent to
      * @see GameInfo#mapData GameInfo.mapData, for information on the map
      * @see #wasLastActionSuccessful() wasLastActionSuccessful(), to check if the request was successful
      */
-    protected void moveUnits(Point2d target, BotUnit... units) {
-        if (units.length != 0) {
-            ActionRawUnitCommandBuilder action = unitCommand().forUnits(botUnits2Units(units)).useAbility(MOVE).target(target);
+    protected void moveUnits(Vec2 target, BotUnit... units) {
+        if (units.length != 0 && target.isValidPoint2d()) {
+            ActionRawUnitCommandBuilder action = unitCommand().forUnits(botUnits2Units(units)).useAbility(MOVE).target(target.getPoint2d().get());
             client.request(actions().of(action().raw(action)));
         }
     }
