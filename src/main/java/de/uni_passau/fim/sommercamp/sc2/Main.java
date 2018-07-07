@@ -34,6 +34,12 @@ public class Main {
             usage = "This activates the 'Bot vs. Bot' mode, you need to specify both bots.")
     private boolean multiPlayer = false;
 
+    @Option(name = "-fps",
+            metaVar = "FPS",
+            usage = "Tries to enforce the given frame-rate (= simulation steps per second) " +
+                    "by delaying bots that are too fast.")
+    private int framerate = 20;
+
     private void doMain(final String[] arguments) throws IOException {
 
         final CmdLineParser parser = new CmdLineParser(this);
@@ -48,6 +54,8 @@ public class Main {
         } catch (CmdLineException clEx) {
             System.out.println("ERROR: Unable to parse command-line options: " + clEx);
         }
+
+        BaseBot.FRAMERATE = framerate;
 
         if (!mapName.endsWith(MAP_EXTENSION)) {
             mapName += MAP_EXTENSION;

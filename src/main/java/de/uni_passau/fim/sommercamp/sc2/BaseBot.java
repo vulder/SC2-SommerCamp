@@ -12,6 +12,7 @@ import com.github.ocraft.s2client.protocol.unit.Unit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -32,10 +33,14 @@ import static com.github.ocraft.s2client.protocol.request.RequestObservation.obs
  */
 public abstract class BaseBot {
 
+    public static long FRAMERATE = 20;
+
     private S2Client client;
     private GameInfo info;
     private GameObservation observation;
     private final AtomicBoolean lastActionSuccessful = new AtomicBoolean(true);
+    private final long frameDelta = 1000 / FRAMERATE;
+    private long lastFrame = 0;
 
     /**
      * Creates a new BaseBot for the given S2Client.
@@ -72,6 +77,7 @@ public abstract class BaseBot {
             observation = new GameObservation(this, r.getObservation());
             if (r.getStatus() != ENDED) {
                 onStep();
+                ensureFps();
                 client.request(RequestStep.nextStep());
 //            TODO check how to allow manual replays but exit the game gracefully
 //            } else {
@@ -216,5 +222,21 @@ public abstract class BaseBot {
      */
     private List<BotUnit> units2BotUnits(Stream<Unit> units) {
         return units.map(u -> new BotUnit(this, u)).collect(Collectors.toList());
+    }
+
+    /**
+     * Sleeps some time to enforce target-fps (= simulation steps per second)
+     */
+    private void ensureFps() {
+        long currentTime = System.currentTimeMillis();
+        long delta = currentTime - lastFrame;
+        if (delta < frameDelta) {
+            try {
+                TimeUnit.MILLISECONDS.sleep(frameDelta - delta);
+            } catch (InterruptedException e) {
+                // ignore
+            }
+        }
+        lastFrame = currentTime;
     }
 }
