@@ -1,9 +1,9 @@
 package de.uni_passau.fim.sommercamp.sc2.bots;
 
 import com.github.ocraft.s2client.api.S2Client;
-import com.github.ocraft.s2client.protocol.spatial.Point2d;
 import de.uni_passau.fim.sommercamp.sc2.BaseBot;
 import de.uni_passau.fim.sommercamp.sc2.BotUnit;
+import de.uni_passau.fim.sommercamp.sc2.util.Vec2;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -37,7 +37,7 @@ public class ExampleBot2 extends BaseBot {
         if (!searching && !attacking) {
             searching = true;
 
-            Point2d base = leader.getPosition();
+            Vec2 base = leader.getPosition();
             if (base.getX() > getInfo().getMapData().getMapSize().getX() / 2) {
                 if (base.getY() > getInfo().getMapData().getMapSize().getY() / 2) {
                     leg = 1;
@@ -99,32 +99,32 @@ public class ExampleBot2 extends BaseBot {
 
         switch (leg) {
             case 0:
-                moveUnits(Point2d.of(maxX, maxY), all);
+                moveUnits(Vec2.of(maxX, maxY), all);
                 break;
 
             case 1:
-                moveUnits(Point2d.of(maxX, minY), all);
+                moveUnits(Vec2.of(maxX, minY), all);
                 break;
 
             case 2:
-                moveUnits(Point2d.of(minX, minY), all);
+                moveUnits(Vec2.of(minX, minY), all);
                 break;
 
             case 3:
-                moveUnits(Point2d.of(minX, maxY), all);
+                moveUnits(Vec2.of(minX, maxY), all);
                 break;
         }
 
         leg = ++leg % 4;
     }
 
-    private Point2d retreatPoint(Point2d self, Point2d enemy) {
+    private Vec2 retreatPoint(Vec2 self, Vec2 enemy) {
         float xDist = (enemy.getX() - self.getX());
         float yDist = (enemy.getY() - self.getY());
         float mag = (float) Math.sqrt(xDist * xDist + yDist * yDist);
         float x = self.getX() - xDist / mag * 5;
         float y = self.getY() - yDist / mag * 5;
-        return Point2d.of(x, y);
+        return Vec2.of(x, y);
     }
 
     private void commandEachUnit(Consumer<BotUnit> cmd, BotUnit... units) {
