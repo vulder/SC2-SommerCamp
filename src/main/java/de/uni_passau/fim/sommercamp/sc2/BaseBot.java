@@ -31,6 +31,7 @@ import static com.github.ocraft.s2client.protocol.request.RequestObservation.obs
 /**
  * A BaseBot is the base class for all Starcraft II bots with the modified ocraft s2client API.
  */
+@SuppressWarnings({"WeakerAccess", "unused"})
 public abstract class BaseBot {
 
     public static long FRAMERATE = 20;

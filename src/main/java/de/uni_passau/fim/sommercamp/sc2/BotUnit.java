@@ -160,7 +160,7 @@ public class BotUnit {
      * Gets the health of the unit.
      *
      * @return the health of the unit
-     * @see #getMaxHealth() getMaxHealth(), for the maximal health of this unit
+     * @see #getMaxHealth() getMaxHealth(), for the maximal health this this unit can have
      */
     public float getHealth() {
         return findByTag(tag).flatMap(Unit::getHealth).orElse(0f);
@@ -184,11 +184,11 @@ public class BotUnit {
      * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
      * {@link UnitNotFoundException} will be thrown.
      *
-     * @return the time in in-game seconds/game loops until the weapon can be used again or {@link Float#MAX_VALUE} if
+     * @return the time in in-game seconds/game loops until the weapon can be used again or {@code -1} if
      * this unit has no weapon cooldown
      */
     public float getWeaponCooldown() {
-        return getByTag(tag).getWeaponCooldown().orElse(Float.MAX_VALUE);
+        return getByTag(tag).getWeaponCooldown().orElse(-1f);
     }
 
     /**
@@ -218,7 +218,7 @@ public class BotUnit {
     }
 
     /**
-     * Sends a ATTACK request, to attack the given (enemy) unit by this unit.
+     * Sends an ATTACK request, to attack the given (enemy) unit by this unit.
      * <p>
      * Note, will only be successful if this unit is {@link #isMine() controlled by this bot}.
      *

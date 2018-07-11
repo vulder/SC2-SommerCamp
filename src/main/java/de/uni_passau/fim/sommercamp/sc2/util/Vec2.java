@@ -7,6 +7,7 @@ import java.util.Optional;
 /**
  * A 2-dimensional vector providing common vector operations.
  */
+@SuppressWarnings({"WeakerAccess", "SameParameterValue"})
 public class Vec2 {
     private float x;
     private float y;
@@ -55,6 +56,14 @@ public class Vec2 {
         return isBetween(x, 0f, 255f) && isBetween(y, 0f, 255f);
     }
 
+    /**
+     * Checks, if the given value is between the low value and the high value.
+     *
+     * @param val  the value to check
+     * @param low  the low
+     * @param high the high
+     * @return {@code true}, if the value is between low and high
+     */
     private boolean isBetween(float val, float low, float high) {
         return (val >= low) && (val <= high);
     }
