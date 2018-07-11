@@ -290,7 +290,7 @@ public class BotUnit {
     @Override
     public String toString() {
         if (isAliveAndVisible()) {
-            return String.format("Unit[id=%s (%s), position=%s, health=%s]", tag.getValue(),
+            return String.format("Unit[id=%s (%s), type=%s, position=%s, health=%s]", tag.getValue(), getType().toString(),
                     getRawUnit().getAlliance(), getPosition(), getHealth());
         } else {
             return String.format("Unit[id=%s]", tag.getValue());

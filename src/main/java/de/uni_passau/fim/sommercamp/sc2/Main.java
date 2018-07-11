@@ -65,7 +65,7 @@ public class Main {
             System.out.println("ERROR: Unable to parse command-line options: " + clEx);
         }
 
-        BaseBot.FRAMERATE = framerate;
+        BaseBot.FRAME_RATE = framerate;
 
         if (!mapName.endsWith(MAP_EXTENSION)) {
             mapName += MAP_EXTENSION;

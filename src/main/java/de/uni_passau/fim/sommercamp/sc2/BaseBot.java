@@ -34,13 +34,13 @@ import static com.github.ocraft.s2client.protocol.request.RequestObservation.obs
 @SuppressWarnings({"WeakerAccess", "unused"})
 public abstract class BaseBot {
 
-    public static long FRAMERATE = 20;
+    public static long FRAME_RATE = 20;
 
     private S2Client client;
     private GameInfo info;
     private GameObservation observation;
     private final AtomicBoolean lastActionSuccessful = new AtomicBoolean(true);
-    private final long frameDelta = 1000 / FRAMERATE;
+    private final long frameDelta = 1000 / FRAME_RATE;
     private long lastFrame = 0;
 
     /**

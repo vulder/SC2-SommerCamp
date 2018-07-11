@@ -156,4 +156,13 @@ public class Vec2 {
     public static float dotProduct(Vec2 a, Vec2 b) {
         return (a.getX() * b.getX()) + (a.getY() * b.getY());
     }
+
+    @Override
+    public String toString() {
+        return "Vec2{" +
+                "x=" + x +
+                ", y=" + y +
+                ", length=" + length +
+                '}';
+    }
 }
