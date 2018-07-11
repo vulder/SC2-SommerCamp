@@ -1,6 +1,7 @@
 package de.uni_passau.fim.sommercamp.sc2;
 
 import com.github.ocraft.s2client.api.S2Client;
+import com.github.ocraft.s2client.protocol.data.Abilities;
 import com.github.ocraft.s2client.protocol.request.Request;
 import com.github.ocraft.s2client.protocol.request.RequestGameInfo;
 import com.github.ocraft.s2client.protocol.request.RequestStep;
@@ -35,6 +36,8 @@ import static com.github.ocraft.s2client.protocol.request.RequestObservation.obs
 public abstract class BaseBot {
 
     public static long FRAME_RATE = 20;
+
+    private final static Abilities.Other HEAL = Abilities.Other.of(2750);
 
     private S2Client client;
     private GameInfo info;
@@ -128,6 +131,23 @@ public abstract class BaseBot {
         if (units.length != 0) {
             client.request(actions().of(action().raw(unitCommand().forUnits(botUnits2Units(units))
                     .useAbility(ATTACK).target(target.getTag()))));
+        }
+    }
+
+    /**
+     * Sends HEAL requests for the given BotUnits to heal the given BotUnit target.
+     * <p>
+     * If the target is not alive or visible, the request will fail to apply.
+     * If no (alive) units are supplied, no request will be sent.
+     *
+     * @param target the target BotUnit
+     * @param units  the BotUnits this action is sent to
+     * @see #wasLastActionSuccessful() wasLastActionSuccessful(), to check if the request was successful
+     */
+    protected void healTarget(BotUnit target, BotUnit... units) {
+        if (units.length != 0) {
+            client.request(actions().of(action().raw(unitCommand().forUnits(botUnits2Units(units))
+                    .useAbility(HEAL).target(target.getTag()))));
         }
     }
 

@@ -201,6 +201,31 @@ public class BotUnit {
         return findByTag(tag).flatMap(u -> u.getEngagedTargetTag().map(t -> new BotUnit(bot, t)));
     }
 
+    /**
+     * Gets the energy of this unit.
+     * <p>
+     * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
+     * {@link UnitNotFoundException} will be thrown.
+     *
+     * @return the energy of the unit
+     * @see #getMaxEnergy() getMaxEnergy(), for the maximal energy this unit can have
+     */
+    public float getEnergy() {
+        return getByTag(tag).getEnergy().orElse(0f);
+    }
+
+    /**
+     * Gets the maximal energy of this unit.
+     * <p>
+     * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
+     * {@link UnitNotFoundException} will be thrown.
+     *
+     * @return the maximal energy of this unit or {@code -1} if it has no available energy data
+     */
+    public float getMaxEnergy() {
+        return getByTag(tag).getEnergy().orElse(-1f);
+    }
+
 
     ///// ACTIONS /////
 
@@ -227,6 +252,19 @@ public class BotUnit {
      */
     public void attack(BotUnit target) {
         findByTag(tag).ifPresent(u -> bot.attackTarget(target, this));
+    }
+
+    /**
+     * Sends a HEAL request, to heal the given (friendly) unit by this unit.
+     * <p>
+     * Note, will only be successful if this unit is {@link #isMine() controlled by this bot, is a medic and has
+     * enought energy}.
+     *
+     * @param target the target friendly unit
+     * @see #getEnergy() getEnergy() for information about the energy of this unit
+     */
+    public void heal(BotUnit target) {
+        findByTag(tag).ifPresent(u -> bot.healTarget(target, this));
     }
 
 

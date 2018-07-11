@@ -59,6 +59,11 @@ public class ExampleBot extends BaseBot {
         if (attacking) {
             attack();
         }
+
+        if (getUnits().stream().anyMatch(u -> u.getHealth() != u.getMaxHealth())) {
+            getUnits().stream().filter(u -> u.getType().getUnitTypeId() == 1731).max(Comparator.comparing(BotUnit::getEnergy))
+                    .ifPresent(u -> getUnits().stream().filter(t -> t.getHealth() != t.getMaxHealth()).findFirst().ifPresent(u::heal));
+        }
     }
 
     private void attack() {
