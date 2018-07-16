@@ -45,6 +45,7 @@ public abstract class BaseBot {
     private final AtomicBoolean lastActionSuccessful = new AtomicBoolean(true);
     private final long frameDelta = 1000 / FRAME_RATE;
     private long lastFrame = 0;
+    private boolean init = false;
 
     /**
      * Creates a new BaseBot for the given S2Client.
@@ -73,12 +74,18 @@ public abstract class BaseBot {
         });
         response.as(ResponseGameInfo.class).ifPresent(r -> {
             info = new GameInfo(r.getPlayersInfo(), r.getMapName(), r.getStartRaw().orElse(null));
-            client.request(observation());
+            client.request(observation().disableFog());
         });
 
         // main game loop
         response.as(ResponseObservation.class).ifPresent(r -> {
             observation = new GameObservation(this, r.getObservation());
+            if (!init && observation.getGameLoop() == 0) {
+                BotUnit.updateCache(observation.getUnits());
+                client.request(observation());
+                init = true;
+                return;
+            }
             if (r.getStatus() != ENDED) {
                 onStep();
                 ensureFps();

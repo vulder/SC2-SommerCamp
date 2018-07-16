@@ -7,9 +7,9 @@ import com.github.ocraft.s2client.protocol.unit.Unit;
 import com.github.ocraft.s2client.protocol.unit.UnitOrder;
 import de.uni_passau.fim.sommercamp.sc2.util.Vec2;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import static com.github.ocraft.s2client.protocol.unit.Alliance.ENEMY;
 import static com.github.ocraft.s2client.protocol.unit.Alliance.SELF;
@@ -20,6 +20,8 @@ import static com.github.ocraft.s2client.protocol.unit.Alliance.SELF;
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class BotUnit {
+
+    private static Map<Key, Unit> cache = new ConcurrentHashMap<>();
 
     private final BaseBot bot;
     private final Tag tag;
@@ -87,26 +89,20 @@ public class BotUnit {
 
     /**
      * Checks if this unit belongs to this bot.
-     * <p>
-     * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
-     * {@link UnitNotFoundException} will be thrown.
      *
      * @return {@code true} if the unit belongs to this bot, {@code false} otherwise
      */
     public boolean isMine() {
-        return getByTag(tag).getAlliance() == SELF;
+        return getCachedByTag(tag).getAlliance() == SELF;
     }
 
     /**
      * Checks if this unit does not belong to this bot and is marked as ENEMY.
-     * <p>
-     * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
-     * {@link UnitNotFoundException} will be thrown.
      *
      * @return {@code true} if the unit is an enemy, {@code false} otherwise
      */
     public boolean isEnemy() {
-        return getByTag(tag).getAlliance() == ENEMY;
+        return getCachedByTag(tag).getAlliance() == ENEMY;
     }
 
     /**
@@ -282,6 +278,17 @@ public class BotUnit {
     }
 
     /**
+     * Uses the cache (populated with the first observation which has the fog disabled) to lookup any unit ever
+     * available during a game.
+     *
+     * @param tag the tag of the unit to look up
+     * @return the Unit
+     */
+    private Unit getCachedByTag(Tag tag) {
+        return cache.get(new Key(tag, bot));
+    }
+
+    /**
      * Tries to find a Unit with the given tag in the current game state
      *
      * @param tag the tag to find
@@ -332,6 +339,48 @@ public class BotUnit {
                     getRawUnit().getAlliance(), getPosition(), getHealth());
         } else {
             return String.format("Unit[id=%s]", tag.getValue());
+        }
+    }
+
+    /**
+     * Adds BotUnits to the cache.
+     *
+     * @param entries the BotUnits to add
+     */
+    static void updateCache(List<BotUnit> entries) {
+        cache.putAll(entries.stream().collect(Collectors.toMap(b -> new Key(b.tag, b.bot), BotUnit::getRawUnit)));
+    }
+
+    /**
+     * A key wrapper for tag/bot combinations
+     */
+    private static class Key {
+        Tag tag;
+        BaseBot bot;
+
+        /**
+         * Creates a new wrapper object
+         *
+         * @param tag the tag of the unit
+         * @param bot the bot instance
+         */
+        Key(Tag tag, BaseBot bot) {
+            this.tag = tag;
+            this.bot = bot;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Key key = (Key) o;
+            return Objects.equals(tag, key.tag) &&
+                    Objects.equals(bot, key.bot);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(tag, bot);
         }
     }
 }
