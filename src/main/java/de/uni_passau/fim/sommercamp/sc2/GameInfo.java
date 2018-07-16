@@ -53,6 +53,8 @@ public class GameInfo {
     /**
      * Gets information about the map.
      *
+     * Map bounds are exclusive (i.e. for a map with dimensions 32x32, 32 is not a valid position)
+     *
      * @return raw data about the map
      * @see StartRaw#getMapSize()
      */
