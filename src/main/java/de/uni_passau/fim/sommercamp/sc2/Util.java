@@ -83,7 +83,7 @@ public final class Util {
         try {
             return clazz.getConstructor(S2Client.class).newInstance(client);
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new IllegalArgumentException("The found bot cannot be instantiated with a constructor with only the argument of the game client");
+            throw new IllegalArgumentException("The found bot cannot be instantiated with a constructor with only the argument of the game client", e);
         }
     }
 }
