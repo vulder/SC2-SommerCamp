@@ -119,7 +119,25 @@ public abstract class BaseBot {
      */
     protected void moveUnits(Vec2 target, BotUnit... units) {
         if (units.length != 0 && target.isValidPoint2d()) {
-            ActionRawUnitCommandBuilder action = unitCommand().forUnits(botUnits2Units(units)).useAbility(MOVE).target(target.getPoint2d().get());
+            ActionRawUnitCommandBuilder action = unitCommand().forUnits(botUnits2Units(Arrays.stream(units))).useAbility(MOVE).target(target.getPoint2d().get());
+            client.request(actions().of(action().raw(action)));
+        }
+    }
+
+    /**
+     * Sends a MOVE request for the given BotUnits to the given map location.
+     * <p>
+     * If the position is not valid, the request will fail to apply.
+     * If no (alive) units are supplied, no request will be sent.
+     *
+     * @param target a valid Vec2 describing the target location on the map
+     * @param units  the BotUnits this action is sent to
+     * @see GameInfo#mapData GameInfo.mapData, for information on the map
+     * @see #wasLastActionSuccessful() wasLastActionSuccessful(), to check if the request was successful
+     */
+    protected void moveUnits(Vec2 target, List<BotUnit> units) {
+        if (!units.isEmpty() && target.isValidPoint2d()) {
+            ActionRawUnitCommandBuilder action = unitCommand().forUnits(botUnits2Units(units.stream())).useAbility(MOVE).target(target.getPoint2d().get());
             client.request(actions().of(action().raw(action)));
         }
     }
@@ -136,7 +154,24 @@ public abstract class BaseBot {
      */
     protected void attackTarget(BotUnit target, BotUnit... units) {
         if (units.length != 0) {
-            client.request(actions().of(action().raw(unitCommand().forUnits(botUnits2Units(units))
+            client.request(actions().of(action().raw(unitCommand().forUnits(botUnits2Units(Arrays.stream(units)))
+                    .useAbility(ATTACK).target(target.getTag()))));
+        }
+    }
+
+    /**
+     * Sends ATTACK requests for the given BotUnits to attack the given BotUnit target.
+     * <p>
+     * If the target is not alive or visible, the request will fail to apply.
+     * If no (alive) units are supplied, no request will be sent.
+     *
+     * @param target the target BotUnit
+     * @param units  the BotUnits this action is sent to
+     * @see #wasLastActionSuccessful() wasLastActionSuccessful(), to check if the request was successful
+     */
+    protected void attackTarget(BotUnit target, List<BotUnit> units) {
+        if (!units.isEmpty()) {
+            client.request(actions().of(action().raw(unitCommand().forUnits(botUnits2Units(units.stream()))
                     .useAbility(ATTACK).target(target.getTag()))));
         }
     }
@@ -153,7 +188,24 @@ public abstract class BaseBot {
      */
     protected void healTarget(BotUnit target, BotUnit... units) {
         if (units.length != 0) {
-            client.request(actions().of(action().raw(unitCommand().forUnits(botUnits2Units(units))
+            client.request(actions().of(action().raw(unitCommand().forUnits(botUnits2Units(Arrays.stream(units)))
+                    .useAbility(HEAL).target(target.getTag()))));
+        }
+    }
+
+    /**
+     * Sends HEAL requests for the given BotUnits to heal the given BotUnit target.
+     * <p>
+     * If the target is not alive or visible, the request will fail to apply.
+     * If no (alive) units are supplied, no request will be sent.
+     *
+     * @param target the target BotUnit
+     * @param units  the BotUnits this action is sent to
+     * @see #wasLastActionSuccessful() wasLastActionSuccessful(), to check if the request was successful
+     */
+    protected void healTarget(BotUnit target, List<BotUnit> units) {
+        if (!units.isEmpty()) {
+            client.request(actions().of(action().raw(unitCommand().forUnits(botUnits2Units(units.stream()))
                     .useAbility(HEAL).target(target.getTag()))));
         }
     }
@@ -237,8 +289,8 @@ public abstract class BaseBot {
      * @return the underlying Units
      * @see #units2BotUnits(Stream)
      */
-    private Unit[] botUnits2Units(BotUnit[] units) {
-        return Arrays.stream(units).map(BotUnit::getUnit).filter(Optional::isPresent).map(Optional::get).toArray(Unit[]::new);
+    private Unit[] botUnits2Units(Stream<BotUnit> units) {
+        return units.map(BotUnit::getUnit).filter(Optional::isPresent).map(Optional::get).toArray(Unit[]::new);
     }
 
     /**
@@ -246,7 +298,7 @@ public abstract class BaseBot {
      *
      * @param units the Units
      * @return the BotUnits wrapping the given units
-     * @see #botUnits2Units(BotUnit[])
+     * @see #botUnits2Units(Stream)
      */
     private List<BotUnit> units2BotUnits(Stream<Unit> units) {
         return units.map(u -> new BotUnit(this, u)).collect(Collectors.toList());
