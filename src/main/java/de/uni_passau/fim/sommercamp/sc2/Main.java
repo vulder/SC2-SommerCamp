@@ -6,12 +6,12 @@ import org.kohsuke.args4j.Option;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Main entry point for stand-alone jar usage.
  */
 public class Main {
-    private static String MAP_EXTENSION = ".SC2Map";
 
     @Option(name = "-map",
             metaVar = "MAP",
@@ -67,9 +67,6 @@ public class Main {
 
         BaseBot.FRAME_RATE = framerate;
 
-        if (!mapName.endsWith(MAP_EXTENSION)) {
-            mapName += MAP_EXTENSION;
-        }
         switch (ai) {
             case OFF:
                 break; // nothing to do
@@ -82,7 +79,7 @@ public class Main {
         }
 
         if (multiPlayer) {
-            MultiPlayerMain.run(mapName, botA, botB);
+            MultiPlayerMain.run(mapName, Arrays.asList(botA, botB));
         } else {
             SinglePlayerMain.run(mapName, botA);
         }

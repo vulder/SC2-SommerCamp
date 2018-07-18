@@ -3,9 +3,7 @@ package de.uni_passau.fim.sommercamp.sc2;
 import com.github.ocraft.s2client.api.S2Client;
 import com.github.ocraft.s2client.api.controller.S2Controller;
 import com.github.ocraft.s2client.api.rx.Responses;
-import com.github.ocraft.s2client.protocol.game.LocalMap;
 import com.github.ocraft.s2client.protocol.game.MultiplayerOptions;
-import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -20,7 +18,7 @@ import static com.github.ocraft.s2client.protocol.game.Race.TERRAN;
 import static com.github.ocraft.s2client.protocol.request.RequestCreateGame.createGame;
 import static com.github.ocraft.s2client.protocol.request.RequestJoinGame.joinGame;
 import static com.github.ocraft.s2client.protocol.response.ResponseType.QUIT_GAME;
-import static de.uni_passau.fim.sommercamp.sc2.Util.getMultipleBots;
+import static de.uni_passau.fim.sommercamp.sc2.ReflectionUtil.getMultipleBots;
 
 /**
  * Entry point for Bot vs Bot multi player games.
@@ -28,10 +26,10 @@ import static de.uni_passau.fim.sommercamp.sc2.Util.getMultipleBots;
 public class MultiPlayerMain {
 
     public static void main(String[] args) throws IOException {
-        run("Marines_2v2_d.SC2Map", "ExampleBot", "ExampleBot");
+        run("maps/Marines_2v2_d.SC2Map", Arrays.asList("ExampleBot", "ExampleBot"));
     }
 
-    static void run(String map, String botA, String botB) throws IOException {
+    static void run(String map, List<String> bot) throws IOException {
 
         S2Controller game01 = starcraft2Game().launch();
         S2Client client01 = starcraft2Client().connectTo(game01).traced(true).start();
@@ -39,11 +37,10 @@ public class MultiPlayerMain {
         S2Controller game02 = starcraft2Game().launch();
         S2Client client02 = starcraft2Client().connectTo(game02).traced(true).start();
 
-        client01.request(createGame()
-                .onLocalMap(LocalMap.of(IOUtils.toByteArray(ClassLoader.getSystemResourceAsStream(map))))
+        client01.request(createGame().onLocalMap(ReflectionUtil.getMapFromName(map))
                 .withPlayerSetup(participant(), participant()));
 
-        List<BaseBot> players = getMultipleBots(Arrays.asList(botA, botB), Arrays.asList(client01, client02));
+        List<BaseBot> players = getMultipleBots(Arrays.asList(bot.get(0), bot.get(1)), Arrays.asList(client01, client02));
         MultiplayerOptions multiplayerOptions = multiplayerSetupFor(S2Controller.lastPort(), 2);
 
         client01.request(joinGame().as(TERRAN).use(interfaces().raw()).with(multiplayerOptions));

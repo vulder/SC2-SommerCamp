@@ -1,27 +1,91 @@
 package de.uni_passau.fim.sommercamp.sc2;
 
 import com.github.ocraft.s2client.api.S2Client;
+import com.github.ocraft.s2client.protocol.game.LocalMap;
+import org.apache.commons.io.IOUtils;
 import org.reflections.Reflections;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.*;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Utility class for reflection api access to find and instantiate bots.
  */
-public final class Util {
+public final class ReflectionUtil {
+
+    static String MAP_EXTENSION = ".SC2Map";
+
     private static Reflections reflections = new Reflections("de.uni_passau.fim.sommercamp.sc2.bots");
     private static Set<Class<? extends BaseBot>> bots = reflections.getSubTypesOf(BaseBot.class);
 
     /**
      * Utility constructor.
      */
-    private Util() { }
+    private ReflectionUtil() { }
+
+    /**
+     *
+     * @return
+     */
+    static List<String> getMaps() {
+        List<String> filenames = new ArrayList<>();
+
+        URI uri = null;
+        try {
+            uri = ControlGUI.class.getResource("/maps").toURI();
+
+            Path myPath;
+            if (uri.getScheme().equals("jar")) {
+                FileSystem fileSystem = null;
+                fileSystem = FileSystems.newFileSystem(uri, Collections.emptyMap());
+                myPath = fileSystem.getPath("/maps");
+            } else {
+                myPath = Paths.get(uri);
+            }
+            Stream<Path> walk = Files.walk(myPath, 1);
+            for (Iterator<Path> it = walk.iterator(); it.hasNext(); ) {
+                File file = it.next().toFile();
+                if (file.isFile()) {
+                    filenames.add(file.getName().replace(".SC2Map", ""));
+                }
+            }
+        } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+        return filenames;
+    }
+
+    /**
+     *
+     * @param name
+     * @return
+     */
+    static LocalMap getMapFromName(String name) {
+        try {
+            return LocalMap.of(IOUtils.toByteArray(ClassLoader.getSystemResourceAsStream("maps/" + (name.endsWith(MAP_EXTENSION) ? name : name + MAP_EXTENSION))));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Gets a list of all available bots.
+     *
+     * @return a alphabetically sorted list of all bots in the class path
+     */
+    static List<String> getBotList() {
+        return bots.stream().map(Class::getSimpleName).sorted(Comparator.naturalOrder()).collect(Collectors.toList());
+    }
 
     /**
      * Creates the first bot it can find for the given client.
