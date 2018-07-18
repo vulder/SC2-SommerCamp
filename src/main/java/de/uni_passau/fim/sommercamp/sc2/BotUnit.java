@@ -1,6 +1,8 @@
 package de.uni_passau.fim.sommercamp.sc2;
 
 import com.github.ocraft.s2client.protocol.data.UnitType;
+import com.github.ocraft.s2client.protocol.data.UnitTypeData;
+import com.github.ocraft.s2client.protocol.data.Weapon;
 import com.github.ocraft.s2client.protocol.spatial.Point;
 import com.github.ocraft.s2client.protocol.unit.Tag;
 import com.github.ocraft.s2client.protocol.unit.Unit;
@@ -22,6 +24,7 @@ import static com.github.ocraft.s2client.protocol.unit.Alliance.SELF;
 public class BotUnit {
 
     private static Map<Key, Unit> cache = new ConcurrentHashMap<>();
+    private static Map<UnitType, UnitTypeData> data = new HashMap<>();
 
     private final BaseBot bot;
     private final Tag tag;
@@ -107,14 +110,11 @@ public class BotUnit {
 
     /**
      * Gets the type of this unit.
-     * <p>
-     * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
-     * {@link UnitNotFoundException} will be thrown.
      *
      * @return the UnitType
      */
     public UnitType getType() {
-        return getByTag(tag).getType();
+        return getCachedByTag(tag).getType();
     }
 
     /**
@@ -222,6 +222,18 @@ public class BotUnit {
         return getByTag(tag).getEnergy().orElse(-1f);
     }
 
+    /**
+     * Gets general data about this unit type.
+     *
+     * @return general data about this unit's type
+     * @see UnitTypeData#getSightRange()
+     * @see UnitTypeData#getWeapons()
+     * @see Weapon#getRange()
+     * @see Weapon#getDamage()
+     */
+    public UnitTypeData getUnitTypeData() {
+        return data.get(getType());
+    }
 
     ///// ACTIONS /////
 
@@ -349,6 +361,15 @@ public class BotUnit {
      */
     static void updateCache(List<BotUnit> entries) {
         cache.putAll(entries.stream().collect(Collectors.toMap(b -> new Key(b.tag, b.bot), BotUnit::getRawUnit)));
+    }
+
+    /**
+     * Fill up the UnitTypeData lookup table.
+     *
+     * @param data the data
+     */
+    static void fillData(Collection<UnitTypeData> data) {
+        data.forEach(d -> BotUnit.data.put(d.getUnitType(), d));
     }
 
     /**

@@ -3,6 +3,7 @@ package de.uni_passau.fim.sommercamp.sc2;
 import com.github.ocraft.s2client.api.S2Client;
 import com.github.ocraft.s2client.protocol.data.Abilities;
 import com.github.ocraft.s2client.protocol.request.Request;
+import com.github.ocraft.s2client.protocol.request.RequestData;
 import com.github.ocraft.s2client.protocol.request.RequestGameInfo;
 import com.github.ocraft.s2client.protocol.request.RequestStep;
 import com.github.ocraft.s2client.protocol.response.*;
@@ -26,6 +27,7 @@ import static com.github.ocraft.s2client.protocol.data.Abilities.MOVE;
 import static com.github.ocraft.s2client.protocol.game.GameStatus.ENDED;
 import static com.github.ocraft.s2client.protocol.game.Race.TERRAN;
 import static com.github.ocraft.s2client.protocol.request.RequestAction.actions;
+import static com.github.ocraft.s2client.protocol.request.RequestData.Type.UNITS;
 import static com.github.ocraft.s2client.protocol.request.RequestJoinGame.joinGame;
 import static com.github.ocraft.s2client.protocol.request.RequestObservation.observation;
 
@@ -76,16 +78,21 @@ public abstract class BaseBot {
             info = new GameInfo(r.getPlayersInfo(), r.getMapName(), r.getStartRaw().orElse(null));
             client.request(observation().disableFog());
         });
+        response.as(ResponseData.class).ifPresent(r -> {
+            BotUnit.fillData(r.getUnitTypes());
+            client.request(observation());
+        });
 
         // main game loop
         response.as(ResponseObservation.class).ifPresent(r -> {
             observation = new GameObservation(this, r.getObservation());
-            if (!init && observation.getGameLoop() == 0) {
+            if (!init) {
                 BotUnit.updateCache(observation.getUnits());
-                client.request(observation());
                 init = true;
+                client.request(RequestData.data().of(UNITS));
                 return;
             }
+
             if (r.getStatus() != ENDED) {
                 onStep();
                 ensureFps();
