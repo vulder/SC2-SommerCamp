@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static javax.swing.ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER;
+
 public class ControlGUI {
     private JPanel basePanel;
     private JButton singlePlayerButton;
@@ -15,10 +17,16 @@ public class ControlGUI {
     private JComboBox<String> mapSelector;
     private JPanel botsPanel;
     private JScrollPane botScroll;
+    private JButton reloadButton;
+    private JSlider fps;
 
     private List<JToggleButton> botSelector = new ArrayList<>();
 
     private ControlGUI(List<String> bots, List<String> maps) {
+
+        JFrame frame = new JFrame("SC2-Bots Starter");
+        frame.setContentPane(basePanel);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         for (int i = 0; i < bots.size(); i++) {
             String bot = bots.get(i);
@@ -31,13 +39,19 @@ public class ControlGUI {
             botsPanel.add(button, gbc);
         }
 
+        frame.pack();
+        int botsWidth = botsPanel.getWidth();
+        botsPanel.setPreferredSize(new Dimension(botsWidth, 0));
         botScroll.setViewportView(botsPanel);
+        botScroll.setHorizontalScrollBarPolicy(HORIZONTAL_SCROLLBAR_NEVER);
+        botScroll.setPreferredSize(new Dimension(botsWidth, 0));
 
         maps.forEach(mapSelector::addItem);
 
         singlePlayerButton.addActionListener(e -> new Thread(() ->
                 botSelector.stream().filter(JToggleButton::isSelected).map(JToggleButton::getText).findFirst().ifPresent(b -> {
                     try {
+                        BaseBot.FRAME_RATE = fps.getValue();
                         SinglePlayerMain.run((String) mapSelector.getSelectedItem(), b);
                     } catch (IOException e1) {
                         e1.printStackTrace();
@@ -52,9 +66,6 @@ public class ControlGUI {
             }
         }).start());
 
-        JFrame frame = new JFrame("SC2-Bots Starter");
-        frame.setContentPane(basePanel);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
     }

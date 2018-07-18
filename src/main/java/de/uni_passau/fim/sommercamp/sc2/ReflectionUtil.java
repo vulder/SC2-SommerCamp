@@ -88,6 +88,16 @@ public final class ReflectionUtil {
     }
 
     /**
+     * Gets a list of all available bots.
+     *
+     * @return a alphabetically sorted list of all bots in the class path
+     */
+    static List<String> getBotList(File path) {
+        return bots.stream().map(Class::getSimpleName).sorted(Comparator.naturalOrder()).collect(Collectors.toList());
+    }
+
+
+    /**
      * Creates the first bot it can find for the given client.
      *
      * @param client the client for access to the game

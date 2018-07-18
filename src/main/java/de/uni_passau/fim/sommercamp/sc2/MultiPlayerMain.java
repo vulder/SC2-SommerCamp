@@ -26,7 +26,7 @@ import static de.uni_passau.fim.sommercamp.sc2.ReflectionUtil.getMultipleBots;
 public class MultiPlayerMain {
 
     public static void main(String[] args) throws IOException {
-        run("maps/Marines_2v2_d.SC2Map", Arrays.asList("ExampleBot", "ExampleBot"));
+        run("Marines_Marauder_4v2_d.SC2Map", Arrays.asList("NumberOneBot", "NumberOneBot"));
     }
 
     static void run(String map, List<String> bot) throws IOException {

@@ -21,7 +21,7 @@ import static com.github.ocraft.s2client.protocol.response.ResponseType.LEAVE_GA
 public class SinglePlayerMain {
 
     public static void main(String[] args) throws IOException {
-        run("maps/Marines_2v2_d.SC2Map", "ExampleBot");
+        run("Marines_2v2_d.SC2Map", "ExampleBot");
     }
 
     static void run(String map, String bot) throws IOException {
