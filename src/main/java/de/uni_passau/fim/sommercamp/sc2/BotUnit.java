@@ -372,6 +372,10 @@ public class BotUnit {
         data.forEach(d -> BotUnit.data.put(d.getUnitType(), d));
     }
 
+    static boolean isInCache(BaseBot bot, Tag tag) {
+        return cache.containsKey(new Key(tag, bot));
+    }
+
     /**
      * A key wrapper for tag/bot combinations
      */
@@ -402,6 +406,14 @@ public class BotUnit {
         @Override
         public int hashCode() {
             return Objects.hash(tag, bot);
+        }
+
+        @Override
+        public String toString() {
+            return "Key{" +
+                    "tag=" + tag +
+                    ", bot=" + bot +
+                    '}';
         }
     }
 }

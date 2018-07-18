@@ -35,8 +35,8 @@ public class GameObservation {
      * @return a list of all units that died since the last step
      */
     public List<BotUnit> getDiedInLastStep() {
-        return observation.getRaw().get().getEvent().map(e -> e.getDeadUnits().stream().map(u ->
-                new BotUnit(bot, u)).collect(Collectors.toList())
+        return observation.getRaw().get().getEvent().map(e -> e.getDeadUnits().stream()
+                .filter(t -> BotUnit.isInCache(bot, t)).map(u -> new BotUnit(bot, u)).collect(Collectors.toList())
         ).orElse(Collections.emptyList());
     }
 
