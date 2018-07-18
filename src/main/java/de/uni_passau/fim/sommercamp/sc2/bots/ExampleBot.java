@@ -2,127 +2,59 @@ package de.uni_passau.fim.sommercamp.sc2.bots;
 
 import com.github.ocraft.s2client.api.S2Client;
 import de.uni_passau.fim.sommercamp.sc2.BaseBot;
-import de.uni_passau.fim.sommercamp.sc2.BotUnit;
-import de.uni_passau.fim.sommercamp.sc2.util.Vec2;
 
-import java.util.Comparator;
-
+/**
+ * Empty bot for the Sommercamp SC2 interface.
+ */
 public class ExampleBot extends BaseBot {
 
-    private boolean searching = false;
-    private boolean attacking = false;
-    private boolean needCooling = false;
+    /* Example
+     private String name;
+    //*/
 
-    private BotUnit runner;
-    private BotUnit target;
-    private int leg = 0;
-
+    /**
+     * This constructor is called by the framework. Extend it with all necessary setup, other constructors won't work.
+     *
+     * @param client The connection to the game.
+     */
     public ExampleBot(S2Client client) {
         super(client);
+
+        /* Example
+         this.name = "FooBot";
+        //*/
     }
 
+    /**
+     * This method is called every step by the framework. The game loop consists of calling this method for every bot and
+     * executing the invoked actions inside the game.
+     */
     @Override
     protected void onStep() {
-        if (runner != null && !runner.isAliveAndVisible()) {
-            return;
-        }
-
-        if (!searching & !attacking) {
-            searching = true;
-
-            runner = getUnits().get(0);
-            Vec2 base = runner.getPosition();
-            if (base.getX() > getInfo().getMapData().getMapSize().getX() / 2) {
-                if (base.getY() > getInfo().getMapData().getMapSize().getY() / 2) {
-                    leg = 1;
-                } else {
-                    leg = 2;
-                }
+        /* Example
+        for (BotUnit u: getObservation().getDiedInLastStep()) {
+            if (u.isMine()) {
+                System.out.println("Oops, not so good :(");
             } else {
-                if (base.getY() > getInfo().getMapData().getMapSize().getY() / 2) {
-                    leg = 0;
-                } else {
-                    leg = 3;
-                }
+                System.out.println("Yeah, one less!");
             }
         }
 
-        if (searching) {
-            patrol();
-        }
-
-        if (!attacking && getVisibleEnemies().size() != 0) {
-            attacking = true;
-            searching = false;
-        }
-
-        if (attacking) {
-            attack();
-        }
-
-        if (getUnits().stream().anyMatch(u -> u.getHealth() != u.getMaxHealth())) {
-            getUnits().stream().filter(u -> u.getType().getUnitTypeId() == 1731).max(Comparator.comparing(BotUnit::getEnergy))
-                    .ifPresent(u -> getUnits().stream().filter(t -> t.getHealth() != t.getMaxHealth()).findFirst().ifPresent(u::heal));
-        }
-    }
-
-    private void attack() {
-        if (runner.getWeaponCooldown() > 0f) {
-            if (needCooling) {
-                if (target.isAliveAndVisible()) {
-                     moveUnits(retreatPoint(runner.getPosition(), target.getPosition()), runner);
-                }
-                needCooling = false;
-            } else if (!target.isAliveAndVisible()) {
-                // target down or out of sight
-                attacking = false;
-                searching = true;
-            }
-        } else if (getVisibleEnemies().size() != 0) {
-            target = getVisibleEnemies().stream().min(Comparator.comparing(BotUnit::getHealth)).get();
-            attackTarget(target, runner);
-            needCooling = true;
-        }
-    }
-
-    private void patrol() {
-        if (!runner.getOrders().isEmpty()) {
+        BotUnit worker = getObservation().getUnits().get(0);
+        if (worker.isAliveAndVisible()) {
             return;
         }
 
-        int border = 4;
-        int maxX = getInfo().getMapData().getMapSize().getX() - border;
-        int minX = border;
-        int maxY = getInfo().getMapData().getMapSize().getY() - border;
-        int minY = border;
-
-        switch (leg) {
-            case 0:
-                moveUnits(Vec2.of(maxX, maxY), runner);
+        for (BotUnit botUnit: getObservation().getUnits()) {
+            if (botUnit.isEnemy()) {
+                worker.attack(botUnit);
                 break;
-
-            case 1:
-                moveUnits(Vec2.of(maxX, minY), runner);
-                break;
-
-            case 2:
-                moveUnits(Vec2.of(minX, minY), runner);
-                break;
-
-            case 3:
-                moveUnits(Vec2.of(minX, maxY), runner);
-                break;
+            }
         }
 
-        leg = ++leg % 4;
-    }
-
-    private Vec2 retreatPoint(Vec2 self, Vec2 enemy) {
-        float xDist = (enemy.getX() - self.getX());
-        float yDist = (enemy.getY() - self.getY());
-        float mag = (float) Math.sqrt(xDist * xDist + yDist * yDist);
-        float x = self.getX() - xDist / mag * 5;
-        float y = self.getY() - yDist / mag * 5;
-        return Vec2.of(x, y);
+        if (worker.getOrders().isEmpty()) {
+            worker.move(Point2d.of(getInfo().getMapData().getMapSize().getX(),1));
+        }
+        //*/
     }
 }
