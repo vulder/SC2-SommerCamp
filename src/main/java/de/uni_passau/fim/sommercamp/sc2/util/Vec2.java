@@ -13,23 +13,54 @@ public class Vec2 {
     private float y;
     private float length;
 
-    private Vec2(float x, float y) {
+    /**
+     * Creates a new vector from the given coordinates.
+     *
+     * @param x the x coordinate of the vector
+     * @param y the y coordinate of the vector
+     * @see #Vec2(Vec2)
+     * @see #getX()
+     * @see #getY()
+     */
+    public Vec2(float x, float y) {
         this.x = x;
         this.y = y;
         this.length = (float) Math.sqrt(dotProduct(this, this));
     }
 
     /**
-     * Creates a new {@link Vec2 vector} from the given coordinates.
+     * Creates a new vector from the given vector, i.e., a copy.
+     *
+     * @param vec the vector to be copied
+     * @see #Vec2(float, float)
+     */
+    public Vec2(Vec2 vec) {
+        this(vec.x, vec.y);
+    }
+
+    /**
+     * Creates a new vector from the given coordinates.
      *
      * @param x the x coordinate of the vector
      * @param y the y coordinate of the vector
      * @return the vector representing the given {@code x} and {@code y} coordinates
+     * @see #of(Vec2)
      * @see #getX()
      * @see #getY()
      */
     public static Vec2 of(float x, float y) {
         return new Vec2(x, y);
+    }
+
+    /**
+     * Creates a new vector from the given vector, i.e., a copy.
+     *
+     * @param vec the vector to be copied
+     * @return a copy of the given vector
+     * @see #of(float, float)
+     */
+    public static Vec2 of(Vec2 vec) {
+        return new Vec2(vec.x, vec.y);
     }
 
     /**
@@ -134,6 +165,41 @@ public class Vec2 {
      */
     public Vec2 normalized() {
         return scaled(1f / getLength());
+    }
+
+    /**
+     * Return a vector that is orthogonal to the current vector,
+     * i.e. the {@link #dotProduct(Vec2, Vec2) dot product} of the vector with the vector returned by this method is 1.
+     *
+     * @return a vector orthogonal to this vector
+     * @see #dotProduct(Vec2, Vec2)
+     */
+    public Vec2 normal() {
+        final Vec2 normalized = this.normalized();
+        return this.normalized().rotated(90, 'd');
+    }
+
+    /**
+     * Return a new vector that is this vector rotated by {@code angle}.
+     *
+     * The mode tells, whether the angle is given in degrees ({@code 'd'}) or radians ({@code 'r'}).
+     *
+     * @param angle the angle to rotate the vector
+     * @param mode whether the angle is given in degrees ({@code 'd'}) or radians ({@code 'r'})
+     * @return the rotated vector
+     */
+    public Vec2 rotated(float angle, char mode) {
+        final float a;
+        switch (mode) {
+            case 'd': a = (float) Math.toRadians(angle); break;
+            case 'r':
+            default: a = angle;
+        }
+
+        final float s = (float) Math.sin(a);
+        final float c = (float) Math.cos(a);
+
+        return Vec2.of(c * this.x - s * this.y, s * this.x + c * this.y);
     }
 
     /**
