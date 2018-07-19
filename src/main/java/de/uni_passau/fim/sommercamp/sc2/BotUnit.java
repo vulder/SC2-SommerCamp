@@ -164,14 +164,11 @@ public class BotUnit {
 
     /**
      * Gets health of this unit at the beginning of the game.
-     * <p>
-     * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
-     * {@link UnitNotFoundException} will be thrown.
      *
      * @return the maximal health of this unit or {@code -1} if it has no available health data
      */
     public float getMaxHealth() {
-        return getByTag(tag).getHealthMax().orElse(-1f);
+        return getCachedByTag(tag).getHealthMax().orElse(-1f);
     }
 
     /**
@@ -212,14 +209,11 @@ public class BotUnit {
 
     /**
      * Gets the maximal energy of this unit.
-     * <p>
-     * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
-     * {@link UnitNotFoundException} will be thrown.
      *
      * @return the maximal energy of this unit or {@code -1} if it has no available energy data
      */
     public float getMaxEnergy() {
-        return getByTag(tag).getEnergy().orElse(-1f);
+        return getCachedByTag(tag).getEnergy().orElse(-1f);
     }
 
     /**
