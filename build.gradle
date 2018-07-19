@@ -23,6 +23,7 @@ allprojects {
 
 dependencies {
     compile group: 'com.github.ocraft', name: 'ocraft-s2client', version: '0.1.5-SNAPSHOT'
+    compile group: 'com.intellij', name: 'forms_rt', version: '182.3684.40'
 
     compile group: 'args4j', name: 'args4j', version: '2.33'
     compile group: 'commons-io', name: 'commons-io', version: '2.6'
