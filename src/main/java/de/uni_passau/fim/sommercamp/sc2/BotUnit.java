@@ -55,31 +55,27 @@ public class BotUnit {
 
     /**
      * Gets the underlying Unit for direct access of additional data.
-     * <p>
-     * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
-     * {@link UnitNotFoundException} will be thrown.
      *
      * @return the underlying Unit wrapped by this BotUnit
+     * @throws UnitNotFoundException if this unit is not {@link #isAliveAndVisible() alive and visible}
      */
-    public Unit getRawUnit() {
+    public Unit getRawUnit() throws UnitNotFoundException {
         return getByTag(tag);
     }
 
     /**
      * Gets a list of all queued Orders issued to this unit.
-     * <p>
-     * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
-     * {@link UnitNotFoundException} will be thrown.
      *
      * @return a list of UnitOrders
+     * @throws UnitNotFoundException if this unit is not {@link #isAliveAndVisible() alive and visible}
      */
-    public List<UnitOrder> getOrders() {
+    public List<UnitOrder> getOrders() throws UnitNotFoundException {
         return getByTag(tag).getOrders();
     }
 
     /**
-     * Checks if the unit represented by this, is still alive, and if it does not belong to this bot, if it is currently
-     * visible by any unit of this bot.
+     * Checks if the unit represented by this BotUnit, is still alive, and if it does not belong to this bot, if it is
+     * currently visible by any unit of this bot.
      *
      * @return {@code true} if the unit is alive and visible, and therefore, if information about it can be obtained,
      * {@code false} otherwise
@@ -119,27 +115,23 @@ public class BotUnit {
 
     /**
      * Gets the position on the map grid, at which this unit is currently.
-     * <p>
-     * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
-     * {@link UnitNotFoundException} will be thrown.
      *
      * @return a Vec2 representing the position
-     * @see GameInfo#mapData GameInfo.mapData, for the map grid
+     * @throws UnitNotFoundException if this unit is not {@link #isAliveAndVisible() alive and visible}
+     * @see GameInfo#getMapData() GameInfo.mapData, for the map grid
      */
-    public Vec2 getPosition() {
+    public Vec2 getPosition() throws UnitNotFoundException {
         Point position = getByTag(tag).getPosition();
         return Vec2.of(position.getX(), position.getY());
     }
 
     /**
      * Get the angle (in radians) the unit faces.
-     * <p>
-     * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
-     * {@link UnitNotFoundException} will be thrown.
      *
      * @return the angle in radians
+     * @throws UnitNotFoundException if this unit is not {@link #isAliveAndVisible() alive and visible}
      */
-    public float getFacing() {
+    public float getFacing() throws UnitNotFoundException {
         return getByTag(tag).getFacing();
     }
 
@@ -173,14 +165,12 @@ public class BotUnit {
 
     /**
      * Gets the time, until the weapon can be used again.
-     * <p>
-     * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
-     * {@link UnitNotFoundException} will be thrown.
      *
      * @return the time in in-game seconds/game loops until the weapon can be used again or {@code -1} if
      * this unit has no weapon cooldown
+     * @throws UnitNotFoundException if this unit is not {@link #isAliveAndVisible() alive and visible}
      */
-    public float getWeaponCooldown() {
+    public float getWeaponCooldown() throws UnitNotFoundException {
         return getByTag(tag).getWeaponCooldown().orElse(-1f);
     }
 
@@ -196,14 +186,12 @@ public class BotUnit {
 
     /**
      * Gets the energy of this unit.
-     * <p>
-     * Note, make sure the unit {@link #isAliveAndVisible() is alive and visible}, otherwise a
-     * {@link UnitNotFoundException} will be thrown.
      *
      * @return the energy of the unit
+     * @throws UnitNotFoundException if this unit is not {@link #isAliveAndVisible() alive and visible}
      * @see #getMaxEnergy() getMaxEnergy(), for the maximal energy this unit can have
      */
-    public float getEnergy() {
+    public float getEnergy()throws UnitNotFoundException {
         return getByTag(tag).getEnergy().orElse(0f);
     }
 
@@ -229,6 +217,7 @@ public class BotUnit {
         return data.get(getType());
     }
 
+
     ///// ACTIONS /////
 
     /**
@@ -247,10 +236,12 @@ public class BotUnit {
     /**
      * Sends an ATTACK request, to attack the given (enemy) unit by this unit.
      * <p>
-     * Note, will only be successful if this unit is {@link #isMine() controlled by this bot}.
+     * Note, will only be successful if this unit is {@link #isMine() controlled by this bot} and has a
+     * {@link #getUnitTypeData() wapon}.
      *
      * @param target the target enemy unit
      * @see BaseBot#attackTarget(BotUnit, BotUnit...)
+     * @see #getUnitTypeData() getUnitTypeData() for information about the wapons of this unit
      */
     public void attack(BotUnit target) {
         findByTag(tag).ifPresent(u -> bot.attackTarget(target, this));
@@ -259,10 +250,11 @@ public class BotUnit {
     /**
      * Sends a HEAL request, to heal the given (friendly) unit by this unit.
      * <p>
-     * Note, will only be successful if this unit is {@link #isMine() controlled by this bot, is a medic and has
-     * enought energy}.
+     * Note, will only be successful if this unit is {@link #isMine() controlled by this bot}, is a
+     * {@link com.github.ocraft.s2client.protocol.data.Units#TERRAN_MEDIC medic} and has enough energy.
      *
      * @param target the target friendly unit
+     * @see BaseBot#healTarget(BotUnit, BotUnit...)
      * @see #getEnergy() getEnergy() for information about the energy of this unit
      */
     public void heal(BotUnit target) {
@@ -279,7 +271,7 @@ public class BotUnit {
      * @return the Unit with this tag
      * @throws UnitNotFoundException if no unit with this tag can be found in the current game state
      */
-    private Unit getByTag(Tag tag) {
+    private Unit getByTag(Tag tag) throws UnitNotFoundException {
         return findByTag(tag).orElseThrow(() -> new UnitNotFoundException("The specified unit is not visible or not alive."));
     }
 
