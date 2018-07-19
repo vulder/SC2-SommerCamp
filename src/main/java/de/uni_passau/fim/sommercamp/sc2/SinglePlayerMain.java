@@ -20,11 +20,11 @@ import static com.github.ocraft.s2client.protocol.response.ResponseType.LEAVE_GA
  */
 public class SinglePlayerMain {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         run("Marines_2v2_d.SC2Map", "ExampleBot");
     }
 
-    static void run(String map, String bot) throws IOException {
+    static void run(String map, String bot) {
         S2Controller game = starcraft2Game().launch();
         S2Client client = starcraft2Client().connectTo(game).traced(true).start();
 

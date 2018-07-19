@@ -25,11 +25,11 @@ import static de.uni_passau.fim.sommercamp.sc2.ReflectionUtil.getMultipleBots;
  */
 public class MultiPlayerMain {
 
-    public static void main(String[] args) throws IOException {
-        run("Marines_Marauder_4v2_d.SC2Map", Arrays.asList("NumberOneBot", "NumberOneBot"));
+    public static void main(String[] args) {
+        run("Marines_2v2_d", Arrays.asList("FleckBot", "FleckBot"));
     }
 
-    static void run(String map, List<String> bot) throws IOException {
+    static void run(String map, List<String> bot) {
 
         S2Controller game01 = starcraft2Game().launch();
         S2Client client01 = starcraft2Client().connectTo(game01).traced(true).start();
