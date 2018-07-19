@@ -37,7 +37,7 @@ import static com.github.ocraft.s2client.protocol.request.RequestObservation.obs
 @SuppressWarnings({"WeakerAccess", "unused"})
 public abstract class BaseBot {
 
-    public static long FRAME_RATE = 20;
+    static long FRAME_RATE = 20;
 
     private final static Abilities.Other HEAL = Abilities.Other.of(2750);
 
@@ -45,7 +45,7 @@ public abstract class BaseBot {
     private GameInfo info;
     private GameObservation observation;
     private final AtomicBoolean lastActionSuccessful = new AtomicBoolean(true);
-    private final long frameDelta = 1000 / FRAME_RATE;
+    private final long frameDelta = 1000 / Math.max(1, FRAME_RATE);
     private long lastFrame = 0;
     private boolean init = false;
 

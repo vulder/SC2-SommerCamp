@@ -19,9 +19,9 @@ import java.util.stream.Stream;
 /**
  * Utility class for reflection api access to find and instantiate bots.
  */
-public final class ReflectionUtil {
+final class ReflectionUtil {
 
-    static String MAP_EXTENSION = ".SC2Map";
+    private final static String MAP_EXTENSION = ".SC2Map";
 
     private static Reflections reflections = new Reflections("de.uni_passau.fim.sommercamp.sc2.bots");
     private static Set<Class<? extends BaseBot>> bots = reflections.getSubTypesOf(BaseBot.class);
@@ -32,13 +32,14 @@ public final class ReflectionUtil {
     private ReflectionUtil() { }
 
     /**
+     * Gets a list of maps available in the resource path.
      *
-     * @return
+     * @return a list of map names
      */
     static List<String> getMaps() {
         List<String> filenames = new ArrayList<>();
 
-        URI uri = null;
+        URI uri;
         try {
             uri = ControlGUI.class.getResource("/maps").toURI();
 
@@ -61,13 +62,15 @@ public final class ReflectionUtil {
             e.printStackTrace();
         }
 
+        filenames.sort(Comparator.naturalOrder());
         return filenames;
     }
 
     /**
+     * Gets a map by its file name.
      *
-     * @param name
-     * @return
+     * @param name the map file name (with or without the extension)
+     * @return the LocalMap
      */
     static LocalMap getMapFromName(String name) {
         try {
