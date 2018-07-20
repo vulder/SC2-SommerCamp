@@ -64,7 +64,15 @@ publishing {
     }
 }
 
+
+tasks.withType(Javadoc) {
+    options {
+        encoding    = "UTF-8"
+        options.addStringOption('tag', 'noinspection:a:""')
+    }
+}
+
 startScripts {
     applicationName = rootProject.name
-    mainClassName = "de.uni_passau.fim.sommercamp.sc2.Main"
+    mainClassName = "de.uni_passau.fim.sommercamp.sc2.ControlGUI"
 }
