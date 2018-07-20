@@ -53,9 +53,9 @@ final class ReflectionUtil {
             }
             Stream<Path> walk = Files.walk(myPath, 1);
             for (Iterator<Path> it = walk.iterator(); it.hasNext(); ) {
-                File file = it.next().toFile();
-                if (file.isFile()) {
-                    filenames.add(file.getName().replace(".SC2Map", ""));
+                String fileName = it.next().getFileName().toString();
+                if (fileName.endsWith(".SC2Map")) {
+                    filenames.add(fileName.replace(".SC2Map", ""));
                 }
             }
         } catch (IOException | URISyntaxException e) {
